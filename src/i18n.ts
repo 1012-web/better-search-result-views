@@ -206,7 +206,7 @@ const zh: Record<MessageKey, string> = {
   "fset.layoutDesc": "按住面板的标题栏可以拖动，按住左下角可以拉宽、拉高；拖到哪、拉多大都会记住，重启后还在。这里可以恢复成默认的右上角与默认大小。",
   "fset.reset": "恢复默认",
 
-  "welcome.title": "欢迎使用 Better Search Result Views（更好的搜索结果展示）",
+  "welcome.title": "欢迎使用 Better Search Result Views·更好的搜索结果展示",
   "welcome.intro": "这个插件给笔记搜索加了这些东西：",
   "welcome.findTitle": "文内查找优化：统一展示文内搜索结果（见下图）",
   "welcome.findText": "在笔记里按 Ctrl+F，浮出一个面板，列出全部命中，点哪条跳哪条。",
