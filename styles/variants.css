@@ -247,8 +247,16 @@
   outline-offset: 1px;
 }
 
-/* Obsidian 自带搜索的树形显示（实验性，设置里打开才生效）：标题行在卡片外，卡片里是命中的上下文，层级用引导线表示 */
+/*
+ * Obsidian 自带搜索的树形显示（实验性，设置里打开才生效）。
+ * 标题行是嵌套的：每个标题下面是带竖线的子区域，竖线从标题下面才开始，对着它的折叠箭头；
+ * 和上一条结果共用的上层标题，竖线在这条结果里从最上面一路画下来，两段对得上，看起来就是一条。
+ */
 .bsrv-sr-wrap {
+  --bsrv-step: 1.1em;
+  --bsrv-guide: var(--background-modifier-border-hover, var(--background-modifier-border));
+  /* 整棵树缩进到文件名的折叠箭头下面 */
+  margin-inline-start: 1.1em;
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -257,42 +265,39 @@
 }
 
 .search-result-file-match.bsrv-sr-match {
-  --bsrv-step: 0.9em;
+  /* 不让卡片的外边距顶出去，竖线才不会在结果之间断开 */
+  display: flow-root;
   margin: 0;
-  padding: 0 0 0 calc(var(--bsrv-depth, 0) * var(--bsrv-step));
+  padding: 0 0 0 calc(var(--bsrv-shared, 0) * var(--bsrv-step));
   border: 0;
   background-color: transparent;
   background-image: repeating-linear-gradient(
     to right,
-    transparent 0,
-    transparent calc(var(--bsrv-step) - 1px),
-    var(--background-modifier-border) calc(var(--bsrv-step) - 1px),
-    var(--background-modifier-border) var(--bsrv-step)
+    var(--bsrv-guide) 0,
+    var(--bsrv-guide) 1px,
+    transparent 1px,
+    transparent var(--bsrv-step)
   );
   background-repeat: no-repeat;
-  background-size: calc(var(--bsrv-depth, 0) * var(--bsrv-step)) 100%;
+  background-position: 0.7em 0;
+  background-size: calc(var(--bsrv-shared, 0) * var(--bsrv-step)) 100%;
 }
 
-.bsrv-sr-rows {
-  margin: 0;
-}
-
-.bsrv-sr-node {
+.bsrv-sr-head {
   display: flex;
   align-items: center;
   gap: 0.3em;
-  margin-inline-start: calc((var(--bsrv-row, 0) - var(--bsrv-depth, 0)) * var(--bsrv-step));
   padding: 0.2em 0.4em;
   color: var(--text-muted);
   font-size: var(--font-ui-small);
   cursor: pointer;
 }
 
-.bsrv-sr-node:hover {
+.bsrv-sr-head:hover {
   color: var(--text-normal);
 }
 
-.bsrv-sr-node::before {
+.bsrv-sr-head::before {
   content: "";
   flex: none;
   width: 0;
@@ -303,29 +308,33 @@
   transition: transform 0.1s;
 }
 
-.bsrv-sr-node.is-collapsed::before {
+.bsrv-sr-node.is-collapsed > .bsrv-sr-head::before {
   transform: rotate(-90deg);
 }
 
-.bsrv-sr-node.is-hidden {
+/* 子区域的左边框正好落在上一层折叠箭头的正下方，内容再缩进半格到下一层 */
+.bsrv-sr-children {
+  /* 卡片的下外边距留在子区域里面，左边框才不会在结果之间断开 */
+  display: flow-root;
+  margin-inline-start: 0.7em;
+  padding-inline-start: calc(var(--bsrv-step) - 0.7em - 1px);
+  border-inline-start: 1px solid var(--bsrv-guide);
+}
+
+.bsrv-sr-node.is-collapsed > .bsrv-sr-children {
   display: none;
 }
 
 .bsrv-sr-body {
   position: relative;
-  margin: 0.1em 0.4em 0.4em 0.2em;
+  margin: 0.1em 0.4em 0.4em 0;
   padding: 0.4em 0.7em;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-m);
 }
 
-/* 整条结果都藏起来时连它自己的内边距也不占位 */
-.bsrv-sr-gone {
-  display: none;
-}
-
-/* 折叠后只留标题行：命中的上下文卡片藏起来 */
-.bsrv-sr-body-hidden > .bsrv-sr-body {
+/* 整条结果都藏起来时连它自己的占位也不要 */
+.search-result-file-match.bsrv-sr-match.bsrv-sr-gone {
   display: none;
 }

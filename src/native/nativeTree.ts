@@ -150,29 +150,43 @@ export class NativeSearchTree {
   private decorateMatch(dom: SearchDom, item: MatchItem, plan: MatchPlan, collapsed: ReadonlySet<number>, path: string, leaf: WorkspaceLeaf): void {
     const el = item.el;
     let changed = false;
-    const signature = `${plan.trail.length}|${plan.rows.map((row) => row.item.from).join(",")}`;
+    // 和上一条共用的上层标题数：这些层的竖线从这条结果的最上面一路画下来；新补出来的标题行各自带着自己那一层的线
+    const shared = plan.rows.length ? plan.rows[0].depth : plan.trail.length;
+    const signature = `${shared}|${plan.rows.map((row) => row.item.from).join(",")}`;
+    if (!el.classList.contains("bsrv-sr-match")) el.classList.add("bsrv-sr-match");
+    el.style.setProperty("--bsrv-shared", String(shared));
+
     let rows = el.querySelector<HTMLElement>(`:scope > .${ROWS_CLASS}`);
+    let body = el.querySelector<HTMLElement>(`.${BODY_CLASS}`);
     if (rows && rows.dataset.sig !== signature) {
+      // 标题行变了：先把卡片拿出来，免得跟着旧的标题行一起被删
+      if (body) el.append(body);
       rows.remove();
       rows = null;
+      changed = true;
     }
     if (!rows && plan.rows.length) {
       rows = this.buildRows(plan, signature, path, leaf);
       el.prepend(rows);
       changed = true;
     }
-    if (!el.classList.contains("bsrv-sr-match")) el.classList.add("bsrv-sr-match");
-    el.style.setProperty("--bsrv-depth", String(plan.trail.length));
-    if (this.wrapBody(el, rows)) changed = true;
 
-    const visibility = visibilityOf(plan, collapsed);
+    // 自带搜索画在 el 里的内容（上下文文字、「显示更多」按钮等）装进一张独立的卡片；它重画这条结果时会先清空 el，下一轮再装
+    const loose = Array.from(el.childNodes).filter((node) => node !== rows && node !== body);
+    if (!body) body = createDiv({ cls: BODY_CLASS });
+    for (const node of loose) body.append(node);
+    const host = rows?.querySelector<HTMLElement>(".bsrv-sr-leaf") ?? el;
+    if (loose.length || body.parentElement !== host) {
+      host.append(body);
+      changed = true;
+    }
+
     rows?.querySelectorAll<HTMLElement>(".bsrv-sr-node").forEach((node, position) => {
-      node.toggleClass("is-hidden", !visibility.rows[position]);
       node.toggleClass("is-collapsed", collapsed.has(plan.rows[position].item.from));
     });
-    el.toggleClass("bsrv-sr-body-hidden", !visibility.body);
-    el.toggleClass("bsrv-sr-gone", !visibility.any);
 
+    const visibility = visibilityOf(plan, collapsed);
+    el.toggleClass("bsrv-sr-gone", !visibility.any);
     const info = item.info;
     if (info) {
       const hide = !visibility.any;
@@ -190,33 +204,26 @@ export class NativeSearchTree {
   }
 
   /**
-   * 把自带搜索画在 el 里的内容（上下文文字、「显示更多」按钮等）装进一张独立的卡片里，
-   * 标题行留在卡片外面。自带搜索重画这条结果时会先清空 el，这里下一轮会再装一次。返回这次是否动过 DOM。
+   * 标题行做成嵌套的：每个标题下面是它的子区域（带左边的竖线），子区域里是下一层标题，最里面一层放结果卡片。
+   * 折叠一个标题就是把它的子区域整个藏起来。
    */
-  private wrapBody(el: HTMLElement, rows: HTMLElement | null): boolean {
-    let body = el.querySelector<HTMLElement>(`:scope > .${BODY_CLASS}`);
-    const loose = Array.from(el.childNodes).filter((node) => node !== rows && node !== body);
-    if (body && !loose.length) return false;
-    if (!body) body = createDiv({ cls: BODY_CLASS });
-    for (const node of loose) body.append(node);
-    if (body.parentElement !== el) el.append(body);
-    return true;
-  }
-
   private buildRows(plan: MatchPlan, signature: string, path: string, leaf: WorkspaceLeaf): HTMLElement {
     const rows = createDiv({ cls: ROWS_CLASS });
     rows.dataset.sig = signature;
+    let parent: HTMLElement = rows;
     for (const row of plan.rows) {
-      const node = rows.createDiv({ cls: "bsrv-sr-node" });
-      node.style.setProperty("--bsrv-row", String(row.depth));
-      node.createSpan({ cls: "bsrv-sr-title", text: row.item.title });
-      node.addEventListener("click", (event) => {
+      const node = parent.createDiv({ cls: "bsrv-sr-node" });
+      const head = node.createDiv({ cls: "bsrv-sr-head" });
+      head.createSpan({ cls: "bsrv-sr-title", text: row.item.title });
+      head.addEventListener("click", (event) => {
         // 点标题行只管折叠，不要让自带搜索当成点了这条结果而跳去打开文件
         event.stopPropagation();
         event.preventDefault();
         this.toggle(path, row.item.from, leaf);
       });
+      parent = node.createDiv({ cls: "bsrv-sr-children" });
     }
+    parent.addClass("bsrv-sr-leaf");
     return rows;
   }
 
@@ -235,14 +242,14 @@ export class NativeSearchTree {
         for (const file of files) {
           for (const item of file.vChildren?._children ?? []) {
             if (!(isElement(item.el))) continue;
-            item.el.querySelector(`:scope > .${ROWS_CLASS}`)?.remove();
-            const body = item.el.querySelector<HTMLElement>(`:scope > .${BODY_CLASS}`);
+            const body = item.el.querySelector<HTMLElement>(`.${BODY_CLASS}`);
             if (body) {
-              while (body.firstChild) item.el.insertBefore(body.firstChild, body);
+              while (body.firstChild) item.el.append(body.firstChild);
               body.remove();
             }
-            item.el.classList.remove("bsrv-sr-match", "bsrv-sr-body-hidden", "bsrv-sr-gone");
-            item.el.style.removeProperty("--bsrv-depth");
+            item.el.querySelector(`:scope > .${ROWS_CLASS}`)?.remove();
+            item.el.classList.remove("bsrv-sr-match", "bsrv-sr-gone");
+            item.el.style.removeProperty("--bsrv-shared");
             if (this.hiddenByUs.has(item) && item.info) {
               item.info.hidden = false;
               this.hiddenByUs.delete(item);
