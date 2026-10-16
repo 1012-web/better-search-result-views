@@ -1,12 +1,16 @@
-import { Plugin, PluginSettingTab, type App } from "obsidian";
+import { Plugin, PluginSettingTab, Setting, type App } from "obsidian";
 import type { SectionHost, SectionKey } from "./core/module";
 import FindModule from "./find/main";
+import { setLanguage, t } from "./i18n";
 import VariantsModule from "./variants/main";
+import { WelcomeModal, shouldShowWelcome } from "./welcome";
 
 /** data.json 的结构：每个部分各存一份设置。 */
 interface PluginData {
   version: 1;
   sections: Partial<Record<SectionKey, unknown>>;
+  /** 已经弹过功能介绍的版本号；没有就是还没弹过 */
+  welcomed?: string;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -17,12 +21,15 @@ function normalizeData(raw: unknown): PluginData {
   const sections = isRecord(raw) && isRecord(raw.sections) ? raw.sections : {};
   const out: PluginData = { version: 1, sections: {} };
   for (const key of ["variants", "find"] as const) if (key in sections) out.sections[key] = sections[key];
+  if (isRecord(raw) && typeof raw.welcomed === "string") out.welcomed = raw.welcomed;
   return out;
 }
 
 export default class HistSearchPlugin extends Plugin implements SectionHost {
   private data: PluginData = { version: 1, sections: {} };
   private saveChain: Promise<void> = Promise.resolve();
+  /** 现在开着的功能介绍弹窗：再打开时先关掉它，免得叠好几层 */
+  private welcome: WelcomeModal | null = null;
   variants!: VariantsModule;
   find!: FindModule;
 
@@ -32,10 +39,37 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
     this.find = new FindModule(this, "find", this.variants);
     await this.variants.onload();
     await this.find.onload();
+    this.addCommand({ id: "show-welcome", name: t("cmd.welcome"), callback: () => this.showWelcome() });
     this.addSettingTab(new HistSearchSettingTab(this.app, this));
+    // 第一次启用：等工作区准备好以后弹一次功能介绍
+    this.app.workspace.onLayoutReady(() => void this.maybeShowWelcome());
+  }
+
+  /** 弹功能介绍。先记下「已经弹过」再弹，免得弹窗出了问题每次启动都弹 */
+  async maybeShowWelcome(): Promise<void> {
+    if (!shouldShowWelcome(this.data.welcomed)) return;
+    this.data.welcomed = this.manifest.version;
+    await this.persist();
+    this.showWelcome();
+  }
+
+  showWelcome(): void {
+    this.welcome?.close();
+    this.welcome = new WelcomeModal(this.app, {
+      variants: this.variants.variantsShown(),
+      nativeEnabled: this.variants.settings.nativeEnhance,
+      onEnableNative: () => this.variants.setNativeEnhance(true)
+    });
+    this.welcome.open();
+  }
+
+  /** 测试和排查用：固定界面语言（传 null 恢复为跟随 Obsidian）。不是给用户的接口。 */
+  debugSetLanguage(language: "en" | "zh" | null): void {
+    setLanguage(language);
   }
 
   onunload(): void {
+    this.welcome?.close();
     this.find.onunload();
     this.variants.onunload();
   }
@@ -48,6 +82,9 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
     containerEl.empty();
     this.variants.renderSettings(containerEl.createDiv({ cls: "bsrv-settings-section" }));
     this.find.renderSettings(containerEl.createDiv({ cls: "bsrv-settings-section" }));
+    new Setting(containerEl)
+      .setName(t("welcome.settingName"))
+      .addButton((button) => button.setButtonText(t("welcome.settingOpen")).onClick(() => this.showWelcome()));
   }
 
   async loadSection(key: SectionKey): Promise<unknown> {

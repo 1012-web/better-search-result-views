@@ -20,7 +20,11 @@ import { rewriteQuery } from "./rewrite";
 
 /** 选项区要用到的外部状态：当前勾选、异体对照表、是否已经自动展开过菜单、存盘 */
 export interface NativeQueryHost {
+  /** 界面上勾选框读写的那份选项（活的） */
   options(): SearchOptions;
+  /** 实际用来改写查询的选项：异体字功能不显示时，「异体字等同」当作没勾 */
+  effectiveOptions(): SearchOptions;
+  variantsShown(): boolean;
   /** 已经建好的异体对照表；还没建好时为 null */
   table(): VariantTable | null;
   ensureTable(): Promise<unknown>;
@@ -85,6 +89,13 @@ export class NativeSearchQuery {
     for (const leaf of [...this.mounted.keys()]) if (!leaves.includes(leaf)) this.unmount(leaf, false);
   }
 
+  /** 选项区要重装（比如「是否显示异体字功能」改了）：先撤再装 */
+  refresh(): void {
+    if (!this.enabled) return;
+    this.teardown();
+    this.sync();
+  }
+
   /** 选项或对照表变了：让每个自带搜索面板按当前查询重搜一遍 */
   rerun(): void {
     for (const { view } of this.mounted.values()) view.startSearch?.();
@@ -136,6 +147,7 @@ export class NativeSearchQuery {
     const body = block.createDiv({ cls: "bsrv-sr-options-body" });
     const options = this.host.options();
     for (const { key, label, title } of OPTION_LABELS) {
+      if (key === "variants" && !this.host.variantsShown()) continue;
       const item = body.createEl("label", { cls: "bsrv-sr-option", attr: { title: t(title) } });
       const check = item.createEl("input", { type: "checkbox" });
       check.checked = options[key];
@@ -154,7 +166,7 @@ export class NativeSearchQuery {
 
   /** ⚙ 按钮上的小圆点：有选项在起作用时亮着，不用点开菜单也看得出搜索被改过 */
   private updateDot(view: SearchViewLike): void {
-    const options = this.host.options();
+    const options = this.host.effectiveOptions();
     const on = options.variants || options.crossAnchors || options.crossMarkup || options.ignorePunct || options.titlesOnly;
     view.filterSectionToggleEl?.toggleClass("bsrv-sr-dot", on);
   }
@@ -170,7 +182,7 @@ export class NativeSearchQuery {
       component.getValue = () => {
         const raw = getValue.call(component);
         try {
-          const options = this.host.options();
+          const options = this.host.effectiveOptions();
           const table = this.host.table();
           if (!table && options.variants && !pending) {
             // 对照表还没建好：这一次先不带异体，建好后自动重搜一次

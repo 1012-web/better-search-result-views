@@ -212,6 +212,39 @@ describe("只改写普通的词，高级语法原样放过", () => {
   });
 });
 
+describe("英文短语：引号里带空格的词，空格处允许夹页码标记和折行", () => {
+  const phrase = '"treaty was signed in Paris"';
+  const q = rewriteQuery(phrase, opts({ crossAnchors: true }), null).query;
+
+  it("被折行和页码标记切开的短语也找得到，没被切开的照样找得到", () => {
+    const re = regexAt(q);
+    expect(re.test("the treaty was signed in Paris, and")).toBe(true);
+    expect(re.test("the treaty was signed in\n<!--p.22-->\nParis in the spring")).toBe(true);
+    expect(re.test("the treaty was signed in<!--p.22-->Paris")).toBe(true);
+  });
+
+  it("单词内部不加缝隙：词不会被拆开", () => {
+    const re = regexAt(q);
+    expect(re.test("the treaty was signed in Par is")).toBe(false);
+    expect(re.test("the trea ty was signed in Paris")).toBe(false);
+  });
+
+  it("没勾「跨页码与折行」时，页码标记和折行不算", () => {
+    const strict = rewriteQuery(phrase, opts({ crossMarkup: true }), null).query;
+    expect(regexAt(strict).test("treaty was signed in\n<!--p.22-->\nParis")).toBe(false);
+    expect(regexAt(strict).test("treaty was signed in Paris")).toBe(true);
+  });
+
+  it("不带引号的几个英文词是自带搜索的「且」，各自单独看，不改写", () => {
+    expect(rewriteQuery("treaty signed Paris", opts({ crossAnchors: true }), null)).toEqual({ query: "treaty signed Paris", changed: false, skipped: false });
+  });
+
+  it("单个英文词不改写；只勾了异体、没有缝隙可加时，英文短语也不改写", () => {
+    expect(rewriteQuery("Paris", opts({ crossAnchors: true }), null).changed).toBe(false);
+    expect(rewriteQuery(phrase, opts({ variants: true }), table).changed).toBe(false);
+  });
+});
+
 describe("中英混排", () => {
   it("英文字母、数字之间不加缝隙，不会让「ab」匹配「a b」", () => {
     const q = rewriteQuery("笔记ab", opts({ crossAnchors: true }), table).query;

@@ -84,9 +84,9 @@ export function normalizeFindSettings(raw: unknown): FindSettings {
 }
 
 /** 交给检索内核的选项：文内查找不用「只搜标题」一项 */
-export function searchOptions(settings: FindSettings): SearchOptions {
+export function searchOptions(settings: FindSettings, variantsOn: boolean = settings.variants): SearchOptions {
   return {
-    variants: settings.variants,
+    variants: variantsOn,
     crossAnchors: settings.crossAnchors,
     crossMarkup: settings.crossMarkup,
     ignorePunct: settings.ignorePunct,

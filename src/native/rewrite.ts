@@ -71,15 +71,29 @@ function anyOptionOn(options: SearchOptions): boolean {
 
 /** 一个词（或引号短语里的内容）→ /正则/；不需要改写时返回 null */
 function rewriteTerm(term: string, options: SearchOptions, table: VariantTable | null, gap: string, lookbehind: boolean): string | null {
-  const chars = [...term].filter((ch) => !/\s/u.test(ch));
+  // 去掉空白，但记住每个字前面原来有没有空白：英文短语里词与词之间的空格，就是要放缝隙的地方
+  const chars: string[] = [];
+  const spaceBefore: boolean[] = [];
+  let pendingSpace = false;
+  for (const ch of term) {
+    if (/\s/u.test(ch)) {
+      pendingSpace = chars.length > 0;
+      continue;
+    }
+    chars.push(ch);
+    spaceBefore.push(pendingSpace);
+    pendingSpace = false;
+  }
   if (!chars.length) return null;
-  if (!options.titlesOnly && !chars.some((ch) => HAN.test(ch))) return null;
+  const phrase = spaceBefore.some(Boolean);
+  // 只改写：含汉字的词、要限制在标题里的词、以及有缝隙可加的带空格的短语（单个英文词没有可跨的地方）
+  if (!options.titlesOnly && !chars.some((ch) => HAN.test(ch)) && !(phrase && gap)) return null;
   const variantTable = options.variants ? table : null;
   let body = "";
   let plain = true;
   chars.forEach((ch, index) => {
-    // 英文字母、数字之间不加缝隙，免得「ab」匹配「a b」
-    if (index > 0 && gap && !(WORD.test(chars[index - 1]) && WORD.test(ch))) {
+    // 英文字母、数字连着写的地方不加缝隙，免得「ab」匹配「a b」；原来有空格的地方、或有一边不是字母数字的地方才加
+    if (index > 0 && gap && (spaceBefore[index] || !(WORD.test(chars[index - 1]) && WORD.test(ch)))) {
       body += gap;
       plain = false;
     }

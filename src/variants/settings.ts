@@ -1,4 +1,5 @@
 /** 异体字检索的设置：对照表来源、自定义异体组、查找面板勾选框的默认值与记忆。 */
+import type { Language } from "../i18n";
 import { DEFAULT_SEARCH_OPTIONS, type SearchOptions } from "./search";
 
 export type SearchScope = "file" | "folder" | "vault";
@@ -17,6 +18,8 @@ export interface VariantSettings {
   scope: SearchScope;
   /** 结果的显示：tree 按文件和标题链归成树，每处带所在段落；compact 一处一行 */
   resultView: ResultView;
+  /** 是否显示异体字功能：null 表示跟随界面语言（中文界面显示，其余隐藏） */
+  showVariants: boolean | null;
   /** 增强 Obsidian 自带搜索：在搜索框下加选项区（按勾选改写查询），结果加标题分层（实验性，默认关） */
   nativeEnhance: boolean;
   /** 第一次启用增强时，是否已经替用户把自带搜索的 ⚙ 菜单自动展开过一次 */
@@ -35,6 +38,7 @@ export const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   options: { ...DEFAULT_SEARCH_OPTIONS },
   scope: "vault",
   resultView: "tree",
+  showVariants: null,
   nativeEnhance: false,
   nativeMenuIntroduced: false,
   maxResults: 500
@@ -59,8 +63,14 @@ export function normalizeVariantSettings(raw: unknown): VariantSettings {
     options,
     scope,
     resultView: source.resultView === "compact" || source.resultView === "tree" ? source.resultView : DEFAULT_VARIANT_SETTINGS.resultView,
+    showVariants: typeof source.showVariants === "boolean" ? source.showVariants : null,
     nativeEnhance: bool(source.nativeEnhance, DEFAULT_VARIANT_SETTINGS.nativeEnhance),
     nativeMenuIntroduced: bool(source.nativeMenuIntroduced, DEFAULT_VARIANT_SETTINGS.nativeMenuIntroduced),
     maxResults: Math.min(5000, Math.max(20, max))
   };
+}
+
+/** 异体字功能要不要显示：设置里明确选了就听设置的，没选（null）就看界面语言——中文显示，其余隐藏 */
+export function variantsShownFor(setting: boolean | null, language: Language): boolean {
+  return setting ?? language === "zh";
 }

@@ -94,6 +94,16 @@ export default class FindModule extends PluginModule {
     await this.saveSettings();
   }
 
+  /** 异体字功能是否显示（中文界面显示，其余隐藏；设置里可改） */
+  variantsShown(): boolean {
+    return this.variants.variantsShown();
+  }
+
+  /** 异体字等同现在是否生效：面板上开着，并且异体字功能没被隐藏 */
+  variantsOn(): boolean {
+    return this.settings.variants && this.variants.variantsShown();
+  }
+
   /** 异体对照表（来源在「异体字检索」的设置里选）；读表出错时为 null */
   async variantTable(): Promise<VariantTable | null> {
     try {

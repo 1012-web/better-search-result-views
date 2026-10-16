@@ -6,14 +6,14 @@
 import { MarkdownView, Notice, TFile } from "obsidian";
 import { PluginModule } from "../core/module";
 import { normalizeNewlines } from "../shared/markdown";
-import { toSearchRegex } from "../shared/variants";
-import { searchText, tokenize, tokenizeKey, type Candidate, type Hit, type Tokens } from "./search";
-import { normalizeVariantSettings, type VariantSettings } from "./settings";
+import { searchText, tokenize, tokenizeKey, type Candidate, type Hit, type SearchOptions, type Tokens } from "./search";
+import { rewriteQuery } from "../native/rewrite";
+import { normalizeVariantSettings, variantsShownFor, type VariantSettings } from "./settings";
 import { buildTable, filesInScope, type BuiltTable, type GroupSource } from "./sources";
 import { VARIANT_SEARCH_VIEW, VariantSearchView } from "./ui/searchView";
 import { renderVariantsSettings } from "./ui/settingsTab";
 import { revealRange } from "./ui/navigate";
-import { t } from "../i18n";
+import { currentLanguage, t } from "../i18n";
 import { NativeSearchQuery } from "../native/nativeQuery";
 import { NativeSearchTree } from "../native/nativeTree";
 
@@ -60,6 +60,8 @@ export default class VariantsModule extends PluginModule {
     this.nativeTree = new NativeSearchTree(this.app);
     this.nativeQuery = new NativeSearchQuery(this.app, {
       options: () => this.settings.options,
+      effectiveOptions: () => this.effectiveOptions(),
+      variantsShown: () => this.variantsShown(),
       table: () => this.built?.table ?? null,
       ensureTable: () => this.table(),
       introduced: () => this.settings.nativeMenuIntroduced,
@@ -149,10 +151,33 @@ export default class VariantsModule extends PluginModule {
     };
   }
 
+  /** 异体字功能是否显示：设置里明确选了就听设置的，没选就看界面语言（中文显示，其余隐藏） */
+  variantsShown(): boolean {
+    return variantsShownFor(this.settings.showVariants, currentLanguage());
+  }
+
+  /** 实际用来检索的选项：异体字功能不显示时，「异体字等同」一律当作没勾 */
+  effectiveOptions(): SearchOptions {
+    const options = this.settings.options;
+    return this.variantsShown() || !options.variants ? options : { ...options, variants: false };
+  }
+
+  /** 设置里改了「是否显示异体字功能」：对照表要重建，自带搜索里的选项区要重装 */
+  async setShowVariants(show: boolean): Promise<void> {
+    this.settings.showVariants = show;
+    await this.saveSettings();
+    this.invalidateTable();
+    this.nativeQuery.refresh();
+  }
+
   async table(): Promise<BuiltTable> {
     if (this.built) return this.built;
     if (!this.building) {
-      this.building = buildTable(this.settings, this.groupSources).then((built) => {
+      // 异体字功能不显示时不建对照表（Unihan 那三张表也就不读了）
+      const source = this.variantsShown()
+        ? this.settings
+        : { ...this.settings, customGroups: "", unihanTradSimp: false, unihanZ: false, unihanSemantic: false };
+      this.building = buildTable(source, this.groupSources).then((built) => {
         this.built = built;
         return built;
       });
@@ -215,7 +240,7 @@ export default class VariantsModule extends PluginModule {
 
   async search(query: string, cancelled: () => boolean): Promise<SearchResult> {
     const { table, sources } = await this.table();
-    const options = this.settings.options;
+    const options = this.effectiveOptions();
     const scope = filesInScope(this.app.vault, this.settings.scope, this.lastMarkdown);
     const notes = sources.filter((source) => source.error).map((source) => `${source.label}：${source.error}`);
     if (options.variants && table.empty) notes.push(t("note.tableEmpty"));
@@ -249,7 +274,7 @@ export default class VariantsModule extends PluginModule {
     new Notice(t("notice.copied", { text: citation }));
   }
 
-  /** 把查询改写成带异体的正则，送进 Obsidian 自带搜索 */
+  /** 按当前的选项改写查询，送进 Obsidian 自带搜索 */
   openCoreSearch(query: string): void {
     void (async () => {
       const trimmed = query.trim();
@@ -258,14 +283,15 @@ export default class VariantsModule extends PluginModule {
         return;
       }
       const { table } = await this.table();
-      const regex = toSearchRegex(trimmed, this.settings.options.variants ? table : null);
+      const rewritten = rewriteQuery(trimmed, this.effectiveOptions(), table);
+      const searchText = rewritten.changed ? rewritten.query : trimmed;
       const internal = (this.app as unknown as { internalPlugins?: InternalPluginsLike }).internalPlugins;
       const search = internal?.getPluginById("global-search");
       if (!search?.enabled || !search.instance) {
         new Notice(t("notice.noCoreSearch"));
         return;
       }
-      search.instance.openGlobalSearch(regex);
+      search.instance.openGlobalSearch(searchText);
     })();
   }
 }

@@ -241,7 +241,8 @@ export class FindPanel {
       button.toggleClass("is-active", on);
       button.setAttribute("aria-pressed", String(on));
     };
-    toggle(this.variantsButton, settings.variants);
+    this.variantsButton.hidden = !this.module.variantsShown();
+    toggle(this.variantsButton, this.module.variantsOn());
     this.variantsButton.setAttribute("aria-label", t("find.variantsTip"));
     toggle(this.punctButton, settings.ignorePunct);
     toggle(this.listButton, settings.showList);
@@ -275,10 +276,10 @@ export class FindPanel {
     const query = this.inputEl.value;
     this.module.lastQuery = query;
     const settings = this.module.settings;
-    const options = searchOptions(settings);
+    const options = searchOptions(settings, this.module.variantsOn());
     const previous = keep && this.current >= 0 ? this.hits[this.current]?.from ?? null : null;
     let table: VariantTable | null = null;
-    if (query.trim() && settings.variants) {
+    if (query.trim() && this.module.variantsOn()) {
       table = await this.module.variantTable();
       if (id !== this.runId || this.closed) return;
     }

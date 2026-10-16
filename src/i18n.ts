@@ -20,9 +20,10 @@ const en = {
   "notice.noMatches": "No matches",
 
   // 命令
-  "cmd.search": "Variant search (across pages)",
-  "cmd.searchSelection": "Variant search for selected text",
-  "cmd.coreSearch": "Search selected text with variants in Obsidian search",
+  "cmd.search": "Search across page breaks",
+  "cmd.searchSelection": "Search selected text across page breaks",
+  "cmd.coreSearch": "Search selected text with options in Obsidian search",
+  "cmd.welcome": "Show feature guide",
   "cmd.findOpen": "Find in note (with result list)",
   "cmd.findCore": "Obsidian built-in find in note",
 
@@ -41,7 +42,7 @@ const en = {
   "find.resize": "Drag to resize",
 
   // 侧栏
-  "vs.title": "Variant search",
+  "vs.title": "Search",
   "vs.placeholder": "Text to find",
   "vs.optVariants": "Variants",
   "vs.optVariantsTip": "Treat variant characters as the same, for example 邺 and 鄴. The sources of the table are chosen in settings",
@@ -59,7 +60,7 @@ const en = {
   "scope.folderLabel": "Folder {name}",
   "scope.root": "Vault root",
   "vs.openCore": "Open in Obsidian search",
-  "vs.openCoreTip": "Rewrite the query as a regular expression that covers variants and open it in Obsidian's built-in search (which cannot match across page markers or markup)",
+  "vs.openCoreTip": "Rewrite the query with the options above and run it in Obsidian's built-in search",
   "vs.searching": "Searching…",
   "vs.summary": "{scope}: {matches} in {files}",
   "vs.capped": " (only the first {n} are listed; change the limit in settings)",
@@ -87,7 +88,9 @@ const en = {
   "src.semantic": "Unihan semantic variants",
 
   // 异体字检索设置
-  "vset.heading": "Variant search",
+  "vset.heading": "Search panel",
+  "vset.showName": "Variant characters",
+  "vset.showDesc": "Treat variant characters such as 鄴 and 邺 as the same when searching Chinese texts. Hidden by default unless Obsidian is set to Chinese.",
   "vset.intro": "When Variants is ticked in the search panel, the variants from the sources below are treated as the same character. The table is only used for searching; your notes are never changed.",
   "vset.customName": "Custom variant groups",
   "vset.customDesc": "One group per line. Characters in a group are variants of each other, for example 於于 or 鄴邺. No separators are needed.",
@@ -116,7 +119,7 @@ const en = {
 
   // 文内查找设置
   "fset.heading": "Find in note",
-  "fset.intro": "A find panel floats over the note: type to search this note, see every match listed below, and click one to jump to it. The toggles for variants, punctuation and the result list are on the panel and remember your last choice.",
+  "fset.intro": "A find panel floats over the note: type to search this note, see every match listed below, and click one to jump to it. The toggles for punctuation and the result list are on the panel and remember your last choice.",
   "fset.takeoverName": "Take over Ctrl+F",
   "fset.takeoverDesc": "Pressing Ctrl+F in a note (Obsidian's built-in find in current file) opens this panel. When off, Ctrl+F goes back to the built-in find bar, and this panel opens from the command Find in note (with result list). The built-in find bar, including replace, is always available from the command Obsidian built-in find in note.",
   "fset.crossName": "Across page markers and line breaks",
@@ -127,7 +130,34 @@ const en = {
   "fset.maxDesc": "{min} to {max}. A common character can have over a thousand matches in one note, and a long list makes the panel slow.",
   "fset.layoutName": "Panel position and size",
   "fset.layoutDesc": "Drag the title bar to move the panel and drag the bottom-left corner to resize it. Where you leave it is remembered after a restart. This resets it to the default top-right position and size.",
-  "fset.reset": "Reset to default"
+  "fset.reset": "Reset to default",
+
+  "welcome.title": "Welcome to Better Search Result Views",
+  "welcome.intro": "Here is what this plugin adds to searching your notes:",
+  "welcome.findTitle": "Find in note",
+  "welcome.findText": "Press Ctrl+F in a note. A floating panel lists every match; click one to jump to it.",
+  "welcome.sideTitle": "Search panel",
+  "welcome.sideText": "Search the current file, folder or whole vault. Results are grouped by heading. If your notes mark pages like <!--p.12-->, each result also shows its page number.",
+  "welcome.crossTitle": "Finds words that are split",
+  "welcome.crossText": "Words broken by a line break, a <!--p.12--> page marker, a tag or a comment are still found.",
+  "welcome.variantsTitle": "Variant characters",
+  "welcome.variantsText": "Variants such as 鄴 and 邺 are treated as the same character. Used for searching only; your notes are never changed.",
+  "welcome.nativeTitle": "Enhance Obsidian search (experimental, off by default)",
+  "welcome.nativeText": "Adds a Search enhancement group to the ⚙ menu of Obsidian's built-in Search, and shows results as a heading tree.",
+  "welcome.compareTitle": "See the difference",
+  "welcome.compareNote": "Left: Obsidian's own search. Right: with search enhancement turned on (it is off by default).",
+  "welcome.cmpCrossTitle": "Words split by a page marker",
+  "welcome.cmpCrossText": "Search for \"treaty was signed in Paris\". The enhancement also finds the one split by a line break and a <!--p.22--> page marker.",
+  "welcome.cmpVariantsTitle": "Variant characters",
+  "welcome.cmpVariantsText": "Search for 邺侯. The enhancement also counts 鄴侯.",
+  "welcome.cmpTreeTitle": "Results grouped by heading",
+  "welcome.cmpTreeText": "Search for \"treaty\". Results sit under their headings, and each heading can be folded.",
+  "welcome.later": "You can open this guide again from the command palette: Show feature guide.",
+  "welcome.enable": "Turn on search enhancement",
+  "welcome.enabled": "Search enhancement is on. Open Obsidian's Search and click the ⚙ button.",
+  "welcome.close": "Got it",
+  "welcome.settingName": "Feature guide",
+  "welcome.settingOpen": "Open"
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -146,7 +176,8 @@ const zh: Record<MessageKey, string> = {
 
   "cmd.search": "查找（异体字、跨页）",
   "cmd.searchSelection": "用选中的文字查找（异体字、跨页）",
-  "cmd.coreSearch": "用选中的文字做异体扩展搜索（Obsidian 自带搜索）",
+  "cmd.coreSearch": "用选中的文字按选项搜索（Obsidian 自带搜索）",
+  "cmd.welcome": "查看功能介绍",
   "cmd.findOpen": "文内查找（带结果列表）",
   "cmd.findCore": "Obsidian 自带的文内查找",
 
@@ -181,7 +212,7 @@ const zh: Record<MessageKey, string> = {
   "scope.folderLabel": "文件夹 {name}",
   "scope.root": "库根目录",
   "vs.openCore": "在 Obsidian 搜索中打开",
-  "vs.openCoreTip": "把查询改写成带异体的正则，送进 Obsidian 自带搜索（自带搜索跨不过页码锚点与标注）",
+  "vs.openCoreTip": "按上面的选项改写查询，在 Obsidian 自带搜索里搜",
   "vs.searching": "查找中……",
   "vs.summary": "{scope}：{matches}，{files}",
   "vs.capped": "（只列前 {n} 处，可在设置里调）",
@@ -207,6 +238,8 @@ const zh: Record<MessageKey, string> = {
   "src.semantic": "Unihan 语义异体",
 
   "vset.heading": "异体字检索",
+  "vset.showName": "异体字功能",
+  "vset.showDesc": "按异体对照表把「鄴／邺」这类异体字当同一个字搜索。Obsidian 界面不是中文时默认隐藏。",
   "vset.intro": "查找面板里勾选「异体字等同」时，下面各来源的异体当同一个字找。对照表只用于检索，不改正文。",
   "vset.customName": "自定义异体组",
   "vset.customDesc": "一行一组，同组的字互为异体，如「於于」「鄴邺」。字与字之间可以不加分隔。",
@@ -245,7 +278,34 @@ const zh: Record<MessageKey, string> = {
   "fset.maxDesc": "{min} 到 {max}。一篇里的常用字可能有上千处，列得太多面板会慢。",
   "fset.layoutName": "面板的位置与大小",
   "fset.layoutDesc": "按住面板的标题栏可以拖动，按住左下角可以拉宽、拉高；拖到哪、拉多大都会记住，重启后还在。这里可以恢复成默认的右上角与默认大小。",
-  "fset.reset": "恢复默认"
+  "fset.reset": "恢复默认",
+
+  "welcome.title": "欢迎使用 Better Search Result Views（更好的搜索结果展示）",
+  "welcome.intro": "这个插件给笔记搜索加了这些东西：",
+  "welcome.findTitle": "文内查找",
+  "welcome.findText": "在笔记里按 Ctrl+F，浮出一个面板，列出全部命中，点哪条跳哪条。",
+  "welcome.sideTitle": "侧栏搜索",
+  "welcome.sideText": "搜当前文件、当前文件夹或全库，结果按标题归成树。如果笔记里用 <!--p.12--> 这样的页码标记标出原书页码，每条结果还会显示页码。",
+  "welcome.crossTitle": "切开的词也找得到",
+  "welcome.crossText": "词被换行、<!--p.12--> 页码标记、标签或注释切开，照样命中。",
+  "welcome.variantsTitle": "异体字等同",
+  "welcome.variantsText": "「鄴／邺」「於／于」这类异体字当同一个字找，只用于检索，不改你的笔记。",
+  "welcome.nativeTitle": "增强 Obsidian 自带搜索（实验性，默认关闭）",
+  "welcome.nativeText": "在自带搜索的 ⚙ 菜单里加一组「搜索增强」选项，并把结果显示成标题树。",
+  "welcome.compareTitle": "效果对比",
+  "welcome.compareNote": "左：Obsidian 自带搜索。右：打开「搜索增强」之后（默认关闭）。",
+  "welcome.cmpCrossTitle": "词被页码标记切开",
+  "welcome.cmpCrossText": "搜「威德被于四远」。打开后，被 <!--p.21--> 页码标记切开的那一处也找到了。",
+  "welcome.cmpVariantsTitle": "异体字等同",
+  "welcome.cmpVariantsText": "搜「邺侯」。打开后，写成「鄴侯」的也算。",
+  "welcome.cmpTreeTitle": "按标题归类的结果",
+  "welcome.cmpTreeText": "搜「鄴城」。结果归在各自的标题下面，每个标题都能折叠。",
+  "welcome.later": "之后随时可以在命令面板里用「查看功能介绍」再看一遍。",
+  "welcome.enable": "打开搜索增强",
+  "welcome.enabled": "搜索增强已打开。打开 Obsidian 的搜索，点搜索框右边的 ⚙ 就能看到。",
+  "welcome.close": "知道了",
+  "welcome.settingName": "功能介绍",
+  "welcome.settingOpen": "打开"
 };
 
 /** 两套文字，供测试核对占位符是否一致 */

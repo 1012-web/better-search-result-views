@@ -6,13 +6,29 @@
 - **切开的词也找得到。** 词被换行、`<!--p.764-->` 页码标记、HTML 标签、`%%备注%%` 或脚注号切开，照样命中。
 - **两个入口。**
   - **文内查找**：正文上浮一个面板（可接管 `Ctrl+F`），列出全部命中，点哪条跳哪条。
-  - **异体字检索**：侧栏面板，范围可选当前文件、当前文件夹或全库，每条结果带页码标记和所在标题。
+  - **异体字检索**：侧栏面板，范围可选当前文件、当前文件夹或全库，每条结果带所在标题；笔记里用 `<!--p.12-->` 这样的页码标记标出原书页码的话，还会显示页码（格式见下面的「页码标记」）。
 - **结果有两种显示，面板上可切换。**
   - **树形**：文件 → 标题链 → 命中所在的段落，命中字高亮；同一段里的几处命中并成一张卡片，标题可折叠。
   - **紧凑**：一处一行。
   - 侧栏默认树形，文内查找默认紧凑。
 
-不联网、无遥测、不需要账号，电脑和手机都能用。界面语言跟随 Obsidian：中文和繁体中文显示中文，其余显示英文。
+不联网、无遥测、不需要账号，电脑和手机都能用。界面语言跟随 Obsidian：中文和繁体中文显示中文，其余显示英文（英文界面默认不显示异体字功能，需要的话在设置里打开）。第一次启用时会弹出一个功能介绍，之后可以在命令面板里用「查看功能介绍」再打开。
+
+## 效果对比
+
+下面三组都是同一份笔记、同一个搜索词的真实截图：左边是 Obsidian 自带搜索，右边是打开设置里的「增强 Obsidian 自带搜索（实验性）」之后。
+
+**词被页码标记切开**：搜「威德被于四远」，自带搜索只找到没被切开的那一处；打开后，被 `<!--p.21-->` 页码标记切开的那一处也找到了。
+
+![词被页码标记切开：之前只找到 1 处，之后找到 2 处](assets/guide/zh-cross.png)
+
+**异体字等同**：搜「邺侯」，自带搜索只找到写成「邺侯」的 2 处；打开后写成「鄴侯」的也算，共 3 处。
+
+![异体字等同：之前 2 处，之后 3 处](assets/guide/zh-variants.png)
+
+**按标题归类的结果**：搜「鄴城」，自带搜索把结果平铺；打开后按标题归成树，每个标题都能折叠。
+
+![按标题归类：之前平铺，之后成树](assets/guide/zh-tree.png)
 
 ## 使用
 
@@ -30,7 +46,11 @@
 
 ## 页码标记
 
-如果你的笔记是古籍或整理本的转写，在第 N 页开始的地方写 `<!--p.N-->`。结果里会显示页码，被页码标记切开的词也能找到。
+如果你的笔记是古籍或整理本的转写，在第 N 页开始的地方写一条 HTML 注释形式的页码标记：`<!--p.N-->`，N 是整数（卷首没有印刷页码时可以写负数，如 `<!--p.-3-->`）。标记里允许多几个空格，如 `<!-- p.12 -->`。
+
+- 只有这种格式会被认作页码标记。`[p.12]`、`<p12>`、`第12页` 这类写法**不会**被识别。
+- 认得出页码标记以后：侧栏里每条结果会显示它所在的页码；被页码标记切开的词也能找到（见上面的对比图）。
+- 没有写这种标记的笔记，一样能搜、能按标题归类，只是不显示页码。
 
 ## 致谢
 
@@ -82,6 +102,14 @@ Search tools for people who work with Chinese historical texts in Obsidian. An i
 - **Two panels.** *Find in note* floats over the note and can take over `Ctrl+F`; *Variant search* is a sidebar that searches the current file, the current folder or the whole vault.
 - **Two result views, switchable on the panel.** *Tree*: file, then the chain of headings, then the paragraph holding each match with the match highlighted (several matches in one paragraph share a card; headings fold). *Compact*: one line per match.
 
-No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). MIT licence; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
+No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). In the English interface the variant-character features are hidden by default (turn them on in settings if you read Chinese sources). A short feature guide opens the first time the plugin is enabled; reopen it any time with the command "Show feature guide".
+
+**Page markers.** If your notes mark where a printed page starts with an HTML comment such as `<!--p.12-->` (the number may be negative, and spaces inside the comment are fine), search results show the page number and words split by the marker are still found. Other styles such as `[p.12]` or `<p12>` are not recognised. Notes without such markers can still be searched and grouped by heading; they just don't show page numbers.
+
+**Before and after** (same notes, same query; left: Obsidian's own search, right: with the optional "Enhance Obsidian search" setting on). Put a phrase in quotes so Obsidian treats it as one phrase.
+
+![A phrase split by a page marker: 1 match before, 2 after](assets/guide/en-cross.png)
+
+![Results grouped by heading: flat before, a tree after](assets/guide/en-tree.png) MIT licence; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
 
 Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, marked as added by this plugin, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.

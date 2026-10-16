@@ -89,6 +89,7 @@ export class VariantSearchView extends ItemView {
     const options = root.createDiv({ cls: "bsrv-vs-options" });
     const settings = this.module.settings;
     for (const { key, label, title } of OPTION_LABELS) {
+      if (key === "variants" && !this.module.variantsShown()) continue;
       const item = options.createEl("label", { cls: "bsrv-vs-option", attr: { title: t(title) } });
       const check = item.createEl("input", { type: "checkbox" });
       check.checked = settings.options[key];

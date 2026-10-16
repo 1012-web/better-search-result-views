@@ -464,3 +464,99 @@
   border-radius: 50%;
   background: var(--interactive-accent);
 }
+
+/* 首次启用的功能介绍弹窗 */
+.bsrv-welcome .bsrv-welcome-intro {
+  margin-top: 0;
+  color: var(--text-muted);
+}
+
+.bsrv-welcome .bsrv-welcome-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+  margin: 0.8em 0 1em;
+}
+
+.bsrv-welcome .bsrv-welcome-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9em;
+}
+
+.bsrv-welcome .bsrv-welcome-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  border-radius: var(--radius-m);
+  background: color-mix(in srgb, var(--interactive-accent) 16%, transparent);
+  color: var(--text-accent);
+}
+
+.bsrv-welcome .bsrv-welcome-icon svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.bsrv-welcome .bsrv-welcome-title {
+  color: var(--text-normal);
+  font-weight: var(--font-medium);
+}
+
+.bsrv-welcome .bsrv-welcome-text {
+  margin-top: 0.15em;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+}
+
+.bsrv-welcome .bsrv-welcome-later {
+  margin: 0 0 1em;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+.bsrv-welcome .bsrv-welcome-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6em;
+}
+
+button.bsrv-find-toggle[hidden] {
+  display: none;
+}
+
+.bsrv-welcome {
+  width: min(680px, 94vw);
+}
+
+.bsrv-welcome .modal-content {
+  max-height: 72vh;
+  overflow-y: auto;
+}
+
+.bsrv-welcome .bsrv-welcome-compare {
+  margin: 0.4em 0 1em;
+  padding-top: 0.9em;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.bsrv-welcome .bsrv-welcome-compare-title {
+  color: var(--text-normal);
+  font-weight: var(--font-semibold);
+}
+
+.bsrv-welcome .bsrv-welcome-figure {
+  margin: 1em 0;
+}
+
+.bsrv-welcome .bsrv-welcome-shot {
+  display: block;
+  width: 100%;
+  margin-top: 0.6em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
