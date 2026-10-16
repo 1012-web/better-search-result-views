@@ -8,6 +8,7 @@ import { EditorView } from "@codemirror/view";
 import { Platform, setIcon, type MarkdownView } from "obsidian";
 import { LineIndex } from "../../shared/markdown";
 import { normalizeNewlines } from "../../shared/markdown";
+import { buildTrailTree, groupByBlock, type TreeNode } from "../../shared/resultTree";
 import type { VariantTable } from "../../shared/variants";
 import { searchText, tokenize, tokenizeKey, type Hit, type SearchOptions, type Tokens } from "../../variants/search";
 import { setFindMarks } from "../highlight";
@@ -28,6 +29,13 @@ const SETTLE_TRIES = 30;
 const SETTLE_MOVES = 3;
 /** 面板拖到底时至少露出标题栏这么高 */
 const HEAD_HEIGHT = 32;
+/** 树形里的一处命中：带上它在整个结果表里的下标 */
+interface IndexedHit {
+  trail: Hit["trail"];
+  hit: Hit;
+  index: number;
+}
+
 /** 结果列表一批建多少行；滚到离底不到 LIST_MARGIN 像素时再建下一批 */
 const LIST_CHUNK = 200;
 const LIST_MARGIN = 300;
@@ -48,6 +56,7 @@ export class FindPanel {
   private readonly statusEl: HTMLElement;
   private readonly listEl: HTMLElement;
   private readonly listButton: HTMLButtonElement;
+  private readonly viewButton: HTMLButtonElement;
   private readonly variantsButton: HTMLButtonElement;
   private readonly punctButton: HTMLButtonElement;
   private readonly marker: PreviewMarker;
@@ -114,12 +123,16 @@ export class FindPanel {
     this.listButton = tools.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "显示查找结果列表" } });
     setIcon(this.listButton, "list");
     this.listButton.addEventListener("click", () => void this.module.updateSettings({ showList: !this.module.settings.showList }));
+    this.viewButton = tools.createEl("button", { cls: "bsrv-find-icon clickable-icon" });
+    setIcon(this.viewButton, "list-tree");
+    this.viewButton.addEventListener("click", () => void this.module.updateSettings({ listView: this.module.settings.listView === "tree" ? "compact" : "tree" }));
 
     this.listEl = this.root.createDiv({ cls: "bsrv-find-list" });
     this.enableResize(this.root.createDiv({ cls: "bsrv-find-resize", attr: { "aria-label": "按住拖动：拉宽、拉高" } }));
     this.listEl.addEventListener("click", (event) => {
-      const row = (event.target as HTMLElement | null)?.closest<HTMLElement>(".bsrv-find-row");
-      const index = Number(row?.dataset.index);
+      const target = event.target as HTMLElement | null;
+      const row = target?.closest<HTMLElement>(".bsrv-find-row, .bsrv-find-card");
+      const index = Number(target?.closest<HTMLElement>("mark[data-hit]")?.dataset.hit ?? row?.dataset.index);
       if (row && Number.isInteger(index)) void this.select(index);
     });
     this.listEl.addEventListener("scroll", () => {
@@ -218,6 +231,8 @@ export class FindPanel {
     this.variantsButton.setAttribute("aria-label", "异体字等同：按对照表把异体当同一个字（邺＝鄴）");
     toggle(this.punctButton, settings.ignorePunct);
     toggle(this.listButton, settings.showList);
+    toggle(this.viewButton, settings.listView === "tree");
+    this.viewButton.setAttribute("aria-label", settings.listView === "tree" ? "现在是树形显示，点一下换成紧凑列表" : "现在是紧凑列表，点一下换成树形显示（按标题归类，带所在段落）");
     this.root.toggleClass("is-list-hidden", !settings.showList);
   }
 
@@ -277,7 +292,9 @@ export class FindPanel {
     const list = this.listEl;
     list.empty();
     this.rendered = 0;
-    this.renderRows(LIST_CHUNK);
+    list.toggleClass("is-tree", this.module.settings.listView === "tree");
+    if (this.module.settings.listView === "tree") this.renderTree();
+    else this.renderRows(LIST_CHUNK);
     list.scrollTop = 0;
     this.paintCurrent();
   }
@@ -316,16 +333,87 @@ export class FindPanel {
     this.rendered = to;
   }
 
+  /** 树形：按标题链归成树，每处命中是一张带所在段落的卡片。一篇正文的命中不多，一次建完 */
+  private renderTree(): void {
+    const doc = this.listEl.doc;
+    const indexed: IndexedHit[] = this.hits.map((hit, index) => ({ trail: hit.trail, hit, index }));
+    const tree = buildTrailTree(indexed);
+    const fragment = doc.createDocumentFragment();
+    for (const group of groupByBlock(tree.rootHits)) fragment.append(this.treeCard(doc, group));
+    for (const node of tree.children) fragment.append(this.treeNode(doc, node));
+    this.listEl.append(fragment);
+    this.rendered = this.hits.length;
+  }
+
+  private treeNode(doc: Document, node: TreeNode<IndexedHit>): HTMLElement {
+    const wrap = doc.createElement("div");
+    wrap.className = "bsrv-find-node";
+    const head = doc.createElement("div");
+    head.className = "bsrv-find-node-head";
+    const title = doc.createElement("span");
+    title.className = "bsrv-find-node-title";
+    title.textContent = node.title || "（无标题）";
+    const count = doc.createElement("span");
+    count.className = "bsrv-find-node-count";
+    count.textContent = String(node.count);
+    head.append(title, count);
+    head.addEventListener("click", () => wrap.classList.toggle("is-collapsed"));
+    const body = doc.createElement("div");
+    body.className = "bsrv-find-node-body";
+    for (const group of groupByBlock(node.hits)) body.append(this.treeCard(doc, group));
+    for (const child of node.children) body.append(this.treeNode(doc, child));
+    wrap.append(head, body);
+    return wrap;
+  }
+
+  /** 同一段里相隔不远的几处命中并成一张卡片，每处都高亮 */
+  private treeCard(doc: Document, group: IndexedHit[]): HTMLElement {
+    const first = group[0];
+    const card = doc.createElement("div");
+    card.className = "bsrv-find-card";
+    card.dataset.index = String(first.index);
+    const line = doc.createElement("span");
+    line.className = "bsrv-find-text";
+    line.append(first.hit.blockBefore);
+    group.forEach(({ hit, index }, position) => {
+      if (position > 0) line.append(hit.joinGap ?? "");
+      const mark = doc.createElement("mark");
+      mark.dataset.hit = String(index);
+      mark.textContent = hit.match;
+      line.append(mark);
+    });
+    line.append(group[group.length - 1].hit.blockAfter);
+    card.append(line);
+    if (first.hit.page !== null) {
+      const page = doc.createElement("span");
+      page.className = "bsrv-find-page";
+      page.textContent = `p.${first.hit.page}`;
+      card.append(page);
+    }
+    return card;
+  }
+
   private paintCurrent(): void {
     const list = this.listEl;
-    list.querySelector(".bsrv-find-row.is-current")?.removeClass("is-current");
+    for (const item of Array.from(list.querySelectorAll(".is-current, .is-current-mark"))) item.removeClass("is-current", "is-current-mark");
+    const tree = this.module.settings.listView === "tree";
     // 当前那处在还没建出来的行里：先建到它后面一点
-    if (this.current >= this.rendered) this.renderRows(this.current + LIST_CHUNK / 2);
-    const row = this.current >= 0 ? (list.children[this.current] as HTMLElement | undefined) : undefined;
+    if (!tree && this.current >= this.rendered) this.renderRows(this.current + LIST_CHUNK / 2);
+    const mark = tree && this.current >= 0 ? list.querySelector<HTMLElement>(`mark[data-hit="${this.current}"]`) : null;
+    const row = this.current < 0 ? undefined : tree
+      ? mark?.closest<HTMLElement>(".bsrv-find-card") ?? undefined
+      : (list.children[this.current] as HTMLElement | undefined);
     if (row) {
       row.addClass("is-current");
+      mark?.addClass("is-current-mark");
       // 只滚列表自己：scrollIntoView 会连带滚动外层的正文
-      if (row.offsetTop < list.scrollTop) list.scrollTop = row.offsetTop;
+      if (tree) {
+        // 树里的卡片嵌在好几层里：展开外面折叠着的结点，按相对位置算
+        for (let up = row.parentElement; up && up !== list; up = up.parentElement) up.removeClass("is-collapsed");
+        const top = row.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop;
+        if (top < list.scrollTop) list.scrollTop = top;
+        else if (top + row.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = top + row.offsetHeight - list.clientHeight;
+      } else if (row.offsetTop < list.scrollTop) list.scrollTop = row.offsetTop;
       else if (row.offsetTop + row.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = row.offsetTop + row.offsetHeight - list.clientHeight;
     }
     this.statusEl.setText(statusText(this.hits.length, this.current, this.capped, this.inputEl.value.trim().length > 0));

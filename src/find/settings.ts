@@ -6,6 +6,8 @@ export interface FindSettings {
   takeover: boolean;
   /** 面板里展开结果列表（面板右侧的列表按钮，下次沿用） */
   showList: boolean;
+  /** 结果列表的显示：compact 一处一行；tree 按标题链归成树，每处带所在段落 */
+  listView: ListView;
   /** 异体字等同（对照表来源在「异体字检索」的设置里选） */
   variants: boolean;
   /** 忽略标点 */
@@ -24,9 +26,12 @@ export interface FindSettings {
   panelHeight: number;
 }
 
+export type ListView = "compact" | "tree";
+
 export const DEFAULT_FIND_SETTINGS: FindSettings = {
   takeover: true,
   showList: true,
+  listView: "compact",
   variants: true,
   ignorePunct: false,
   crossAnchors: true,
@@ -65,6 +70,7 @@ export function normalizeFindSettings(raw: unknown): FindSettings {
   return {
     takeover: bool(source.takeover, d.takeover),
     showList: bool(source.showList, d.showList),
+    listView: source.listView === "tree" || source.listView === "compact" ? source.listView : d.listView,
     variants: bool(source.variants, d.variants),
     ignorePunct: bool(source.ignorePunct, d.ignorePunct),
     crossAnchors: bool(source.crossAnchors, d.crossAnchors),

@@ -15,9 +15,13 @@ export interface VariantSettings {
   /** 查找面板上次用的勾选框与范围，下次打开沿用 */
   options: SearchOptions;
   scope: SearchScope;
+  /** 结果的显示：tree 按文件和标题链归成树，每处带所在段落；compact 一处一行 */
+  resultView: ResultView;
   /** 最多列出几处命中 */
   maxResults: number;
 }
+
+export type ResultView = "tree" | "compact";
 
 export const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   customGroups: "",
@@ -26,6 +30,7 @@ export const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   unihanSemantic: false,
   options: { ...DEFAULT_SEARCH_OPTIONS },
   scope: "vault",
+  resultView: "tree",
   maxResults: 500
 };
 
@@ -47,6 +52,7 @@ export function normalizeVariantSettings(raw: unknown): VariantSettings {
     unihanSemantic: bool(source.unihanSemantic, DEFAULT_VARIANT_SETTINGS.unihanSemantic),
     options,
     scope,
+    resultView: source.resultView === "compact" || source.resultView === "tree" ? source.resultView : DEFAULT_VARIANT_SETTINGS.resultView,
     maxResults: Math.min(5000, Math.max(20, max))
   };
 }

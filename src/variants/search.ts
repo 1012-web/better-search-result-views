@@ -37,6 +37,12 @@ export interface Candidate {
   values: string[];
 }
 
+/** 标题链上的一环：标题文字，加上它在原文里的起点（同名标题靠它区分） */
+export interface TrailItem {
+  title: string;
+  from: number;
+}
+
 export interface Hit {
   from: number;
   to: number;
@@ -46,6 +52,13 @@ export interface Hit {
   page: number | null;
   /** 所属的最近一个标题（书目条目名），没有时为 null */
   entry: string | null;
+  /** 所属标题链：从最外层到最近的标题；没有标题时为空数组 */
+  trail: TrailItem[];
+  /** 命中所在段落里，命中之前、之后的文字（已清理；过长时截断，截断处以「…」标出） */
+  blockBefore: string;
+  blockAfter: string;
+  /** 与上一处命中同在一个段落、且相隔不远时，两处之间的文字；否则为 null（树形显示据此把它们并成一张卡片） */
+  joinGap: string | null;
   /** 显示用的上下文（去掉了标签、注释与 Markdown 记号） */
   before: string;
   match: string;
@@ -185,18 +198,76 @@ function contextAfter(text: string, to: number): string {
   return [...raw].slice(0, CONTEXT_CHARS).join("");
 }
 
+const BLOCK_BEFORE_CHARS = 120;
+const BLOCK_AFTER_CHARS = 160;
+/** 同一段里两处命中相隔不超过这么多字，就并成一张卡片显示 */
+const JOIN_GAP_CHARS = 60;
+
+const HAN = /\p{Script=Han}/u;
+
+/** 命中紧挨着汉字时，折行留下的空白一并去掉（折行在中文里不该显示成空格） */
+function trimNextToHan(fragment: string, neighbour: string, side: "start" | "end"): string {
+  if (!HAN.test(neighbour)) return fragment;
+  return side === "start" ? fragment.trimStart() : fragment.trimEnd();
+}
+
+/** 中文行与行之间的折行不该留空格：两个汉字（或全角标点）之间只隔着空白的，把空白去掉 */
+function tidyBlock(cleaned: string): string {
+  return cleaned.replace(/(\p{Script=Han}|[，。；：？！、」』）》”’])\s+(?=\p{Script=Han}|[，。；：？！、「『（《“‘])/gu, "$1");
+}
+
+/** 命中所在段落（以空行为界）里，命中前后的文字；过长时各自截断 */
+function blockContext(text: string, from: number, to: number): { before: string; after: string } {
+  const startAt = text.lastIndexOf("\n\n", from);
+  const blockStart = startAt < 0 ? 0 : startAt + 2;
+  const endAt = text.indexOf("\n\n", to);
+  const blockEnd = endAt < 0 ? text.length : endAt;
+  const before = [...trimNextToHan(tidyBlock(cleanForDisplay(text.slice(blockStart, from))), text.charAt(from), "end").trimStart()];
+  const after = [...trimNextToHan(tidyBlock(cleanForDisplay(text.slice(to, blockEnd))), text.charAt(to - 1), "start").trimEnd()];
+  return {
+    before: before.length > BLOCK_BEFORE_CHARS ? `…${before.slice(-BLOCK_BEFORE_CHARS).join("")}` : before.join(""),
+    after: after.length > BLOCK_AFTER_CHARS ? `${after.slice(0, BLOCK_AFTER_CHARS).join("")}…` : after.join("")
+  };
+}
+
 interface Heading {
   from: number;
   to: number;
   title: string;
+  level: number;
 }
 
 function headings(text: string): Heading[] {
   const out: Heading[] = [];
-  for (const m of text.matchAll(/^#{1,6}[ \t]+(.*)$/gm)) {
-    out.push({ from: m.index, to: m.index + m[0].length, title: cleanForDisplay(m[1]).trim() });
+  for (const m of text.matchAll(/^(#{1,6})[ \t]+(.*)$/gm)) {
+    out.push({ from: m.index, to: m.index + m[0].length, title: cleanForDisplay(m[2]).trim(), level: m[1].length });
   }
   return out;
+}
+
+/** 每个标题的标题链：它自己加上一路往外的上级（比它层级浅、且离它最近的那些标题） */
+function headingTrails(heads: Heading[]): TrailItem[][] {
+  const stack: Heading[] = [];
+  return heads.map((heading) => {
+    while (stack.length && stack[stack.length - 1].level >= heading.level) stack.pop();
+    stack.push(heading);
+    return stack.map((item) => ({ title: item.title, from: item.from }));
+  });
+}
+
+/** 有序标题表里最后一个起点 ≤ offset 的下标；没有时 -1 */
+function headingIndexAt(heads: Heading[], offset: number): number {
+  let low = 0;
+  let high = heads.length - 1;
+  let found = -1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (heads[mid].from <= offset) {
+      found = mid;
+      low = mid + 1;
+    } else high = mid - 1;
+  }
+  return found;
 }
 
 /** 有序数组里最后一个 key ≤ offset 的元素 */
@@ -259,7 +330,8 @@ export function searchText(input: SearchInput): Hit[] {
 
   const titleRanges = options.titlesOnly ? headings(text) : null;
   const anchors = pageMarkers(text);
-  const heads = headings(text);
+  const heads = titleRanges ?? headings(text);
+  const trails = headingTrails(heads);
   const lines = new LineIndex(text);
   const limit = input.limit ?? Infinity;
   const hits: Hit[] = [];
@@ -284,12 +356,27 @@ export function searchText(input: SearchInput): Hit[] {
       const heading = lastAtOrBefore(titleRanges, from, (h) => h.from);
       if (!heading || to > heading.to) continue;
     }
+    const headIndex = headingIndexAt(heads, from);
+    const block = blockContext(text, from, to);
+    const previousHit = hits[hits.length - 1];
+    let joinGap: string | null = null;
+    if (previousHit) {
+      const raw = text.slice(previousHit.to, from);
+      if (!raw.includes("\n\n")) {
+        const gap = trimNextToHan(trimNextToHan(tidyBlock(cleanForDisplay(raw)), text.charAt(from), "end"), text.charAt(previousHit.to - 1), "start");
+        if ([...gap].length <= JOIN_GAP_CHARS) joinGap = gap;
+      }
+    }
     hits.push({
+      joinGap,
       from,
       to,
       line: lines.lineAt(from),
       page: lastAtOrBefore(anchors, from, (a) => a.offset)?.page ?? null,
-      entry: lastAtOrBefore(heads, from, (h) => h.from)?.title ?? null,
+      entry: headIndex >= 0 ? heads[headIndex].title : null,
+      trail: headIndex >= 0 ? trails[headIndex] : [],
+      blockBefore: block.before,
+      blockAfter: block.after,
       before: contextBefore(text, from),
       match: cleanForDisplay(text.slice(from, to)),
       after: contextAfter(text, to),

@@ -148,3 +148,101 @@
   color: var(--text-muted);
   font-size: var(--font-ui-small);
 }
+
+/* 树形显示：文件 → 标题链 → 命中所在的段落卡片 */
+.bsrv-vs-view-toggle {
+  margin-left: auto;
+}
+
+.bsrv-vs-node-head {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.2em 0.1em;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+
+.bsrv-vs-node-head:hover {
+  background: var(--background-modifier-hover);
+}
+
+.bsrv-vs-collapse {
+  display: inline-flex;
+  color: var(--text-faint);
+  transition: transform 0.1s;
+}
+
+.bsrv-vs-collapse svg {
+  width: 1em;
+  height: 1em;
+}
+
+.bsrv-vs-node.is-collapsed > .bsrv-vs-node-head .bsrv-vs-collapse {
+  transform: rotate(-90deg);
+}
+
+.bsrv-vs-node.is-collapsed > .bsrv-vs-node-body {
+  display: none;
+}
+
+.bsrv-vs-node-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.bsrv-vs-node-count {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+.bsrv-vs-list.is-tree .bsrv-vs-node-head.bsrv-vs-file {
+  margin-top: 0.6em;
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-semibold);
+}
+
+.bsrv-vs-heading {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.bsrv-vs-node-body {
+  margin-left: 0.55em;
+  padding-left: 0.5em;
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+.bsrv-vs-card {
+  position: relative;
+  margin: 0.25em 0;
+  padding: 0.4em 0.55em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary-alt);
+  cursor: pointer;
+}
+
+.bsrv-vs-card:hover {
+  background: var(--background-modifier-hover);
+}
+
+.bsrv-vs-card.is-current {
+  border-color: var(--interactive-accent);
+}
+
+.bsrv-vs-card:hover .bsrv-vs-actions,
+.bsrv-vs-card.is-current .bsrv-vs-actions {
+  display: flex;
+}
+
+.bsrv-vs-card .bsrv-vs-text {
+  margin-top: 0;
+}
+
+.bsrv-vs-text mark.is-current-mark {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}

@@ -287,3 +287,82 @@ button.bsrv-find-toggle:disabled {
   background-color: var(--bsrv-find-current);
   color: var(--bsrv-find-key-text);
 }
+
+/* 树形显示：标题链 → 命中所在的段落卡片 */
+.bsrv-find-node-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.7em;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
+.bsrv-find-node-head::before {
+  content: "";
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 0.3em solid transparent;
+  border-right: 0.3em solid transparent;
+  border-top: 0.4em solid var(--text-faint);
+  transition: transform 0.1s;
+}
+
+.bsrv-find-node.is-collapsed > .bsrv-find-node-head::before {
+  transform: rotate(-90deg);
+}
+
+.bsrv-find-node.is-collapsed > .bsrv-find-node-body {
+  display: none;
+}
+
+.bsrv-find-node-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.bsrv-find-node-count {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+.bsrv-find-node-body {
+  margin-left: 0.7em;
+  padding-left: 0.4em;
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+.bsrv-find-card {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0.2em 0.4em 0.2em 0;
+  padding: 0.4em 0.6em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary-alt);
+  cursor: pointer;
+}
+
+.bsrv-find-card:hover {
+  background: var(--background-modifier-hover);
+}
+
+.bsrv-find-card.is-current {
+  border-color: var(--interactive-accent);
+}
+
+.bsrv-find-card .bsrv-find-text {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+  line-height: 1.6;
+}
+
+.bsrv-find-text mark.is-current-mark {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
