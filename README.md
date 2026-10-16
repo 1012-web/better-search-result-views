@@ -1,11 +1,9 @@
 # Better Search Result Views（更好的搜索结果展示）
 
-本插件优化了 Obsidian 的搜索结果展示方式：
+本插件优化了 Obsidian 的搜索结果展示，分两处：
 
-- **文内查找。** 在笔记里按 `Ctrl+F`（可选接管），浮出一个面板，列出全部命中，点哪条跳哪条；命中归在各自的标题层级下面，可折叠，面板上可在树形和紧凑（一处一行）之间切换。
-- **自带搜索的结果更好看。** Obsidian 自带的搜索，结果显示成标题树；⚙ 菜单里多一组「搜索增强」选项（可在设置里关）。搜索范围仍用自带的 `path:` 写法。
-- **切开的词也找得到。** 词被换行、`<!--p.12-->` 页码标记、标签或注释切开，照样命中。
-- **异体字等同。** 「鄴／邺」「於／于」这类异体字当同一个字找，只用于检索，不改你的笔记。
+- **文内查找优化：统一展示文内搜索结果。** 在笔记里按 `Ctrl+F`（可选接管），浮出一个面板，把全部命中按标题层级列出来，可折叠；点哪条，正文就跳到哪处并高亮。自带的 `Ctrl+F` 一次只标出一处，要靠上下箭头逐处翻。面板上可在树形和紧凑（一处一行）之间切换。
+- **自带侧栏搜索优化。** Obsidian 自带的侧栏搜索，结果显示成标题树，点结果照常跳转；⚙ 菜单里多一组「搜索增强」选项（默认开启，可在设置里关）。搜索范围仍用自带的 `path:` 写法。搜索增强带来三样：结果按标题归类；词被换行、`<!--p.12-->` 页码标记、标签或注释切开，照样命中；「鄴／邺」「於／于」这类异体字当同一个字找（只用于检索，不改你的笔记）。
 
 异体字和页码标记主要给读中文古籍、史料转写的人用，其他人可以不管。笔记里用 `<!--p.12-->` 标出原书页码的话，文内查找的结果会带页码（格式见下面的「页码标记」）。
 
@@ -15,23 +13,29 @@
 
 ## 效果对比
 
-下面四组都是同一份笔记、同一个搜索词的真实截图。前三组是侧栏搜索：左边是 Obsidian 自带搜索，右边是开启设置里的「增强 Obsidian 自带搜索」之后（默认开启）；第四组是文内查找。
+下面都是同一份笔记、同一个搜索词的真实截图。
 
-**词被页码标记切开**：搜「威德被于四远」，自带搜索只找到没被切开的那一处；打开后，被 `<!--p.21-->` 页码标记切开的那一处也找到了。
+### 文内查找优化
 
-![词被页码标记切开：之前只找到 1 处，之后找到 2 处](assets/guide/zh-cross.png)
+同一篇有多级标题的笔记里搜「纳谏」。自带的 `Ctrl+F` 一次只标出一处，要靠上下箭头逐处跳转；本插件的查找面板把 7 处命中按「卷 → 篇」的标题层级列出来，一眼看全篇，点哪处跳哪处。（上图是自带，下图是本插件。）
 
-**异体字等同**：搜「邺侯」，自带搜索只找到写成「邺侯」的 2 处；打开后写成「鄴侯」的也算，共 3 处。
+![文内查找：自带 Ctrl+F 一次一处，本插件按标题一览](assets/guide/find-zh.png)
 
-![异体字等同：之前 2 处，之后 3 处](assets/guide/zh-variants.png)
+### 自带侧栏搜索优化
 
-**按标题归类的结果**：搜「鄴城」，自带搜索把结果平铺；打开后按标题归成树，每个标题都能折叠。
+下面每组图：左边是 Obsidian 自带搜索，右边是开启「搜索增强」之后。
+
+**按标题归类的结果**：搜「鄴城」，自带搜索把结果平铺；开启后按标题归成树，每个标题都能折叠。
 
 ![按标题归类：之前平铺，之后成树](assets/guide/zh-tree.png)
 
-**文内查找（Ctrl+F）：按标题一览**：同一篇有多级标题的笔记里搜「纳谏」。自带的 Ctrl+F 一次只标出一处，要靠上下箭头逐处跳转；本插件的查找面板把 7 处命中按「卷 → 篇」的标题层级列出来，一眼看全篇，点哪处跳哪处。（这一组上下排开：上面是自带，下面是本插件。）
+**词被页码标记切开**：搜「威德被于四远」，自带搜索只找到没被切开的那一处；开启后，被 `<!--p.21-->` 页码标记切开的那一处也找到了。
 
-![文内查找：自带 Ctrl+F 一次一处，本插件按标题一览](assets/guide/find-zh.png)
+![词被页码标记切开：之前只找到 1 处，之后找到 2 处](assets/guide/zh-cross.png)
+
+**异体字等同**：搜「邺侯」，自带搜索只找到写成「邺侯」的 2 处；开启后写成「鄴侯」的也算，共 3 处。
+
+![异体字等同：之前 2 处，之后 3 处](assets/guide/zh-variants.png)
 
 ## 使用
 
@@ -95,12 +99,10 @@ npm run unihan -- <Unihan.zip>   # 重新生成 Unihan 对照表
 
 # Better Search Result Views (English summary)
 
-This plugin improves how Obsidian shows search results:
+This plugin improves how Obsidian shows search results, in two places:
 
-- **Find in note.** Press `Ctrl+F` (taking it over is optional) for a floating panel that lists every match; click one to jump to it. Matches sit under their headings, which fold, and the panel switches between tree and compact (one line per match).
-- **Better results in Obsidian's own search.** Its results show as a heading tree, and its ⚙ menu gets a group of "Search enhancement" options (switch it off in settings). Limit the scope with the built-in `path:` operator.
-- **Finds words that are split.** Words broken by a line break, a `<!--p.12-->` page marker, a tag or a comment are still found.
-- **Variant characters.** Variants such as `鄴` and `邺` count as the same character. Used for searching only; your notes are never changed.
+- **Find in note: all matches in one view.** Press `Ctrl+F` (taking it over is optional) for a floating panel that lists every match under its headings, which fold; click one and the note jumps to it and highlights it. Obsidian's own `Ctrl+F` marks one match at a time. The panel switches between tree and compact (one line per match).
+- **A better built-in sidebar search.** Obsidian's own sidebar Search shows its results as a heading tree, and clicking a result jumps as usual. Its ⚙ menu gets a group of "Search enhancement" options (on by default; switch it off in settings); limit the scope with the built-in `path:` operator. The enhancement brings three things: results grouped under headings; words split by a line break, a `<!--p.12-->` page marker, a tag or a comment are still found; and variant characters such as `鄴` and `邺` count as the same (used for searching only; your notes are never changed).
 
 Variants and page markers are mainly for people who read Chinese historical texts; you can ignore them otherwise. If your notes mark pages like `<!--p.12-->`, the find-in-note panel shows each result's page number.
 
@@ -110,15 +112,15 @@ No network access, no telemetry, no account; works on desktop and mobile. The in
 
 **Page markers.** If your notes mark where a printed page starts with an HTML comment such as `<!--p.12-->` (the number may be negative, and spaces inside the comment are fine), the find-in-note panel shows the page number and words split by the marker are still found. Other styles such as `[p.12]` or `<p12>` are not recognised. Notes without such markers can still be searched and grouped by heading; they just don't show page numbers.
 
-**Before and after** (same notes, same query; left: Obsidian's own search, right: with the "Enhance Obsidian search" setting on, which is the default). Put a phrase in quotes so Obsidian treats it as one phrase.
+**Find in note.** Same note, same word. Top: Obsidian's own `Ctrl+F`; bottom: this plugin's find in note, with every match under its headings.
 
-![A phrase split by a page marker: 1 match before, 2 after](assets/guide/en-cross.png)
+![Find in note: one match at a time before, all matches by heading after](assets/guide/find-en.png)
+
+**Built-in sidebar search.** In each pair, left: Obsidian's own search; right: with the "Enhance Obsidian search" setting on (the default). Put a phrase in quotes so Obsidian treats it as one phrase.
 
 ![Results grouped by heading: flat before, a tree after](assets/guide/en-tree.png)
 
-**Find in note (Ctrl+F).** Obsidian's own Ctrl+F marks one match at a time; this plugin's panel lists every match under its headings. Top: Obsidian; bottom: this plugin.
-
-![Find in note: one match at a time before, all matches by heading after](assets/guide/find-en.png)
+![A phrase split by a page marker: 1 match before, 2 after](assets/guide/en-cross.png)
 
 Licence: MIT; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
 
