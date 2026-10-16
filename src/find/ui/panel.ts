@@ -141,6 +141,8 @@ export class FindPanel {
     setIcon(this.viewButton, "list-tree");
     this.viewButton.addEventListener("click", () => void this.module.updateSettings({ listView: this.module.settings.listView === "tree" ? "compact" : "tree" }));
 
+    if (!this.module.settings.viewTipShown) this.showViewTip();
+
     this.listEl = this.root.createDiv({ cls: "bsrv-find-list" });
     this.enableResize(this.root.createDiv({ cls: "bsrv-find-resize", attr: { "aria-label": t("find.resize") } }));
     this.listEl.addEventListener("click", (event) => {
@@ -182,6 +184,19 @@ export class FindPanel {
 
     this.syncToggles();
     this.layout();
+  }
+
+  /** 第一次打开面板：工具栏下提示一次视图按钮，点 × 或切换视图就收起；记下已提示，以后不再出现 */
+  private showViewTip(): void {
+    const tip = this.root.createDiv({ cls: "bsrv-find-tip" });
+    tip.createSpan({ text: t("find.viewTip") });
+    const close = tip.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": t("find.close") } });
+    setIcon(close, "x");
+    const dismiss = () => tip.remove();
+    close.addEventListener("click", dismiss);
+    this.viewButton.addEventListener("click", dismiss);
+    this.listButton.addEventListener("click", dismiss);
+    void this.module.updateSettings({ viewTipShown: true });
   }
 
   /** 把焦点放进搜索框；给了 prefill 就填上并立即查 */
@@ -365,6 +380,7 @@ export class FindPanel {
     wrap.className = "bsrv-find-node";
     const head = windowOf(doc).createDiv();
     head.className = "bsrv-find-node-head";
+    head.dataset.level = String(node.level);
     const chevron = windowOf(doc).createSpan();
     chevron.className = "bsrv-find-chevron";
     setIcon(chevron, "chevron-down");

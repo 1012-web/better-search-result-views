@@ -33,6 +33,7 @@ const en = {
   "find.ignorePunct": "Ignore punctuation",
   "find.ignorePunctTip": "Punctuation is ignored when matching, so 乙酉春 also finds 乙酉，春",
   "find.showList": "Show the result list",
+  "find.viewTip": "Tip: the two buttons on the right switch between the heading tree and one line per match, and hide or show the list.",
   "find.resize": "Drag to resize",
 
   // 搜索选项（自带搜索的 ⚙ 菜单里的勾选项）
@@ -148,6 +149,7 @@ const zh: Record<MessageKey, string> = {
   "find.ignorePunct": "忽略标点",
   "find.ignorePunctTip": "标点不参与比对：「乙酉春」也能找到「乙酉，春」",
   "find.showList": "显示查找结果列表",
+  "find.viewTip": "提示：右边两个按钮可在「按标题成树」与「一处一行」之间切换，也可收起结果列表。",
   "find.resize": "按住拖动：拉宽、拉高",
 
   "vs.optVariants": "异体字等同",

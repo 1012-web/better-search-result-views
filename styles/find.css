@@ -329,6 +329,34 @@ button.bsrv-find-toggle:disabled {
   height: 100%;
 }
 
+/* 级别图标比箭头醒目一档，H1、H2 取主题的强调色，一眼分出大标题 */
+.bsrv-find-level {
+  width: 1.15em;
+  height: 1.15em;
+  color: var(--text-muted);
+}
+
+.bsrv-find-node-head[data-level="1"] .bsrv-find-level,
+.bsrv-find-node-head[data-level="2"] .bsrv-find-level {
+  color: var(--text-accent);
+}
+
+/* 字重随级别递减，跟正文里标题的轻重对应 */
+.bsrv-find-node-head[data-level="1"] {
+  font-weight: var(--font-bold);
+}
+
+.bsrv-find-node-head[data-level="2"] {
+  font-weight: var(--font-semibold);
+}
+
+.bsrv-find-node-head[data-level="4"],
+.bsrv-find-node-head[data-level="5"],
+.bsrv-find-node-head[data-level="6"] {
+  font-weight: var(--font-normal);
+  color: var(--text-muted);
+}
+
 .bsrv-find-chevron {
   transition: transform 0.1s;
 }
@@ -395,4 +423,23 @@ button.bsrv-find-toggle:disabled {
 .bsrv-find-text mark.is-current-mark {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 1px;
+}
+
+/* 第一次打开面板时的视图按钮提示 */
+.bsrv-find-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4em;
+  flex: none;
+  margin: 0 0.5em 0.4em;
+  padding: 0.4em 0.3em 0.4em 0.6em;
+  border-radius: var(--radius-s);
+  background: var(--background-modifier-hover);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.4;
+}
+
+.bsrv-find-tip > span {
+  flex: 1;
 }

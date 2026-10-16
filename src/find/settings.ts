@@ -8,6 +8,8 @@ export interface FindSettings {
   showList: boolean;
   /** 结果列表的显示：compact 一处一行；tree 按标题链归成树，每处带所在段落 */
   listView: ListView;
+  /** 已提示过「右边两个按钮可切换视图、收起列表」：第一次打开面板时提示一次 */
+  viewTipShown: boolean;
   /** 异体字等同（对照表来源在「异体字检索」的设置里选） */
   variants: boolean;
   /** 忽略标点 */
@@ -31,7 +33,8 @@ export type ListView = "compact" | "tree";
 export const DEFAULT_FIND_SETTINGS: FindSettings = {
   takeover: true,
   showList: true,
-  listView: "compact",
+  listView: "tree",
+  viewTipShown: false,
   variants: true,
   ignorePunct: false,
   crossAnchors: true,
@@ -71,6 +74,7 @@ export function normalizeFindSettings(raw: unknown): FindSettings {
     takeover: bool(source.takeover, d.takeover),
     showList: bool(source.showList, d.showList),
     listView: source.listView === "tree" || source.listView === "compact" ? source.listView : d.listView,
+    viewTipShown: bool(source.viewTipShown, d.viewTipShown),
     variants: bool(source.variants, d.variants),
     ignorePunct: bool(source.ignorePunct, d.ignorePunct),
     crossAnchors: bool(source.crossAnchors, d.crossAnchors),
