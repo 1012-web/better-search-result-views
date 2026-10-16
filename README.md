@@ -4,9 +4,9 @@
 
 - **结果按标题归类。** 命中归在各自的标题层级下面（文件 → 一级标题 → 二级标题 → 命中所在的段落），命中字高亮，标题可折叠；同一段里的几处命中合成一张卡片。
 - **文内查找。** 当前笔记里按 `Ctrl+F`（可选接管），弹出面板列出全部命中，点哪条跳哪条；不用再靠上下箭头逐处翻。
-- **侧栏搜索。** 范围可选当前文件、当前文件夹或全库；也可以让 Obsidian 自带的搜索面板直接显示成标题树（默认开启，可在设置里关）。
+- **自带搜索一起升级。** Obsidian 自带的侧栏搜索，结果也显示成标题树；⚙ 菜单里多一组勾选项（异体字、跨页码与折行、只搜标题等）。默认开启，可在设置里关。搜索范围仍用自带的 `path:` 写法。
 - **切开的词也找得到。** 词被换行、HTML 标签、`%%备注%%`、脚注号或页码标记切开，照样命中。
-- **两种显示，面板上可切换。** 树形（见上）和紧凑（一处一行）；侧栏默认树形，文内查找默认紧凑。
+- **文内查找有两种显示，面板上可切换。** 树形（见上）和紧凑（一处一行），默认紧凑。
 - **读中文古籍、史料转写的人另有两样。** 异体字当同一个字找（「鄴／邺」「於／于」「後／后」互通，对照表只用于检索，不改你的笔记）；笔记里用 `<!--p.12-->` 标出原书页码的话，结果会带页码（格式见下面的「页码标记」）。其他用途可以不管它们。
 
 本插件独立开发，与 [Better Search Views](https://github.com/ivan-lednev/better-search-views) 没有隶属关系，参考关系见文末「致谢」。
@@ -38,10 +38,8 @@
 命令面板里的命令名（英文界面下是对应的英文）：
 
 - **文内查找（带结果列表）**：打开正文上的浮动面板；有选中的文字就拿它当查询。
-- **查找（异体字、跨页）**：打开侧栏。左侧功能区的搜索图标同样可以打开。
-- **用选中的文字做异体扩展搜索（Obsidian 自带搜索）**：把选中的字改写成覆盖其异体的正则，交给 Obsidian 自带搜索。
 - **Obsidian 自带的文内查找**：接管 `Ctrl+F` 之后，仍可从这里调出自带的查找条（含替换）。
-- 面板上的开关：异体、忽略标点、跨页码与折行、跨标注与注释、结果显示（树形／紧凑）。
+- 文内查找面板上的开关：异体、忽略标点、结果列表的显示与隐藏、结果显示（树形／紧凑）。
 
 ## 设置
 
@@ -52,7 +50,7 @@
 如果你的笔记是古籍或整理本的转写，在第 N 页开始的地方写一条 HTML 注释形式的页码标记：`<!--p.N-->`，N 是整数（卷首没有印刷页码时可以写负数，如 `<!--p.-3-->`）。标记里允许多几个空格，如 `<!-- p.12 -->`。
 
 - 只有这种格式会被认作页码标记。`[p.12]`、`<p12>`、`第12页` 这类写法**不会**被识别。
-- 认得出页码标记以后：侧栏里每条结果会显示它所在的页码；被页码标记切开的词也能找到（见上面的对比图）。
+- 认得出页码标记以后：文内查找面板里每条结果会显示它所在的页码；被页码标记切开的词也能找到（见上面的对比图）。
 - 没有写这种标记的笔记，一样能搜、能按标题归类，只是不显示页码。
 
 ## 致谢
@@ -70,8 +68,7 @@
 
 - 勾选的选项只在**搜索的那一刻**把你输入的词改写成 Obsidian 搜索认得的正则，搜索框里的字不动，保存下来的搜索也不变。
 - 只改写普通的词和引号短语。`path:`、`tag:`、`file:`、`line:` 这类操作符，自己写的 `/正则/`、`[属性]`、`OR`、括号、排除符 `-` 原样保留；面板会提示这部分不受选项影响。
-- 这组选项和侧栏面板共用同一份勾选。
-- 它是用正则去近似本插件自己面板的匹配规则，自己的面板仍是最精确的。
+- 它是用正则去近似本插件文内查找面板的匹配规则，两者对个别写法的处理可能略有差别（比如内容里带 `>` 的 HTML 注释，这里跳不过去）。
 
 要知道的限制：
 
@@ -102,16 +99,16 @@ This plugin improves how Obsidian shows search results:
 
 - **Results grouped by heading.** Each match sits under its heading levels (file, then H1, H2, and so on, then the paragraph holding the match) with the match highlighted. Headings fold, and several matches in one paragraph share a card.
 - **Find in note.** Press `Ctrl+F` (taking it over is optional) to get a panel that lists every match in the note; click one to jump to it instead of stepping with the arrows.
-- **Sidebar search.** Search the current file, the current folder or the whole vault. Obsidian's own Search panel also shows its results as a heading tree, with a group of search options in its ⚙ menu (on by default; switch it off in settings).
+- **The built-in search gets better too.** Obsidian's own sidebar Search shows its results as a heading tree, with a group of checkbox options in its ⚙ menu (variants, across page markers and line breaks, headings only, and more). On by default; switch it off in settings. Limit the scope with the built-in `path:` operator.
 - **Search across breaks.** Words split by a line break, an inline HTML tag, a `%%comment%%`, a footnote mark or a page marker are still found.
-- **Two views, switchable on the panel.** Tree (above) and compact (one line per match); the sidebar defaults to tree, find in note to compact.
+- **Find in note has two views, switchable on the panel.** Tree (above) and compact (one line per match); compact is the default.
 - **Two extras if you read Chinese historical texts.** Variant characters count as the same (`鄴` and `邺`, `於` and `于`, `後` and `后`; the table is used for searching only and your notes are never rewritten), and page markers such as `<!--p.12-->` show up as page numbers in the results. You can ignore both otherwise.
 
 An independent plugin, not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
 
 No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). In the English interface the variant-character features are hidden by default (turn them on in settings if you read Chinese sources). A short feature guide opens the first time the plugin is enabled; reopen it any time with the command "Show feature guide".
 
-**Page markers.** If your notes mark where a printed page starts with an HTML comment such as `<!--p.12-->` (the number may be negative, and spaces inside the comment are fine), search results show the page number and words split by the marker are still found. Other styles such as `[p.12]` or `<p12>` are not recognised. Notes without such markers can still be searched and grouped by heading; they just don't show page numbers.
+**Page markers.** If your notes mark where a printed page starts with an HTML comment such as `<!--p.12-->` (the number may be negative, and spaces inside the comment are fine), the find-in-note panel shows the page number and words split by the marker are still found. Other styles such as `[p.12]` or `<p12>` are not recognised. Notes without such markers can still be searched and grouped by heading; they just don't show page numbers.
 
 **Before and after** (same notes, same query; left: Obsidian's own search, right: with the "Enhance Obsidian search" setting on, which is the default). Put a phrase in quotes so Obsidian treats it as one phrase.
 

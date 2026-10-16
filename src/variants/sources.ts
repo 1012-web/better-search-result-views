@@ -1,10 +1,9 @@
 /**
- * 检索用到的外部数据：异体对照表的各来源、要搜的文件。只用 vault 接口，手机上也能用。
+ * 检索用到的外部数据：异体对照表的各来源。
  */
-import { TFile, type Vault } from "obsidian";
 import { UNIHAN_SEMANTIC, UNIHAN_TRAD_SIMP, UNIHAN_Z } from "../shared/unihan-variants";
 import { VariantTable, parseGroupLines } from "../shared/variants";
-import type { SearchScope, VariantSettings } from "./settings";
+import type { VariantSettings } from "./settings";
 import { t } from "../i18n";
 
 /** 折叠表各来源的登记情况，面板与设置页上显示 */
@@ -53,25 +52,4 @@ export async function buildTable(settings: VariantSettings, extra: readonly Grou
     }
   }
   return { table, sources };
-}
-
-export interface ScopeResult {
-  files: TFile[];
-  /** 面板上显示的范围说明，如「文件夹 史料/晚明」 */
-  label: string;
-}
-
-/** 按范围列出要搜的 Markdown 文件。activePath 是最近打开的正文；没有时「当前文件」「当前文件夹」都退为全库 */
-export function filesInScope(vault: Vault, scope: SearchScope, activePath: string | null): ScopeResult {
-  const all = vault.getMarkdownFiles();
-  if (scope === "file" && activePath) {
-    const file = vault.getAbstractFileByPath(activePath);
-    if (file instanceof TFile) return { files: [file], label: file.basename };
-  }
-  if (scope === "folder" && activePath) {
-    const root = activePath.includes("/") ? activePath.slice(0, activePath.lastIndexOf("/")) : "";
-    const prefix = root ? `${root}/` : "";
-    return { files: all.filter((file) => file.path.startsWith(prefix)), label: root ? t("scope.folderLabel", { name: root }) : t("scope.root") };
-  }
-  return { files: all, label: t("scope.vault") };
 }

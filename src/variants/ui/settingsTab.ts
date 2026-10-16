@@ -58,17 +58,6 @@ export function renderVariantsSettings(containerEl: HTMLElement, module: Variant
       }));
   }
 
-  new Setting(containerEl).setName(t("vset.resultHeading")).setHeading();
-  new Setting(containerEl)
-    .setName(t("vset.maxName"))
-    .setDesc(t("vset.maxDesc"))
-    .addText((text) => text.setValue(String(s.maxResults)).onChange(async (value) => {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return;
-      s.maxResults = Math.min(5000, Math.max(20, Math.round(n)));
-      await module.saveSettings();
-    }));
-
   new Setting(containerEl)
     .setName(t("vset.nativeName"))
     .setDesc(t("vset.nativeDesc"))

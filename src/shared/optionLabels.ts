@@ -1,7 +1,7 @@
 import type { MessageKey } from "../i18n";
 import type { SearchOptions } from "../variants/search";
 
-/** 检索选项的勾选框：键、显示名、说明（侧栏面板和自带搜索里的选项区共用同一份） */
+/** 检索选项的勾选框：键、显示名、说明（自带搜索里的选项区用） */
 export const OPTION_LABELS: Array<{ key: keyof SearchOptions; label: MessageKey; title: MessageKey }> = [
   { key: "variants", label: "vs.optVariants", title: "vs.optVariantsTip" },
   { key: "crossAnchors", label: "vs.optCross", title: "vs.optCrossTip" },

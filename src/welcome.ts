@@ -38,11 +38,10 @@ export class WelcomeModal extends Modal {
 
     const items: Item[] = [
       { icon: "search", title: "welcome.findTitle", text: "welcome.findText" },
-      { icon: "list-tree", title: "welcome.sideTitle", text: "welcome.sideText" },
+      { icon: "list-tree", title: "welcome.nativeTitle", text: "welcome.nativeText" },
       { icon: "scissors", title: "welcome.crossTitle", text: "welcome.crossText" }
     ];
     if (this.options.variants) items.push({ icon: "languages", title: "welcome.variantsTitle", text: "welcome.variantsText" });
-    items.push({ icon: "sliders-horizontal", title: "welcome.nativeTitle", text: "welcome.nativeText" });
 
     const list = contentEl.createDiv({ cls: "bsrv-welcome-list" });
     for (const item of items) {

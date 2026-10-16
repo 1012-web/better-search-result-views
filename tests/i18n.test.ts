@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { catalogs, filesLabel, matchesLabel, setLanguage, t, type MessageKey } from "../src/i18n";
+import { catalogs, matchesLabel, setLanguage, t, type MessageKey } from "../src/i18n";
 import { statusText } from "../src/find/rows";
 
 afterEach(() => setLanguage(null));
@@ -30,21 +30,21 @@ describe("两套界面文字", () => {
 describe("t 与数量词", () => {
   it("按语言取文字并代入占位符", () => {
     setLanguage("en");
-    expect(t("notice.cannotOpen", { path: "a/b.md" })).toBe("Cannot open: a/b.md");
+    expect(t("n.firstMatches", { n: 5 })).toBe("First 5 matches");
     setLanguage("zh");
-    expect(t("notice.cannotOpen", { path: "a/b.md" })).toBe("打不开：a/b.md");
+    expect(t("n.firstMatches", { n: 5 })).toBe("前 5 处");
   });
 
   it("没给的占位符原样留着，不抛错", () => {
     setLanguage("en");
-    expect(t("notice.copied")).toBe("Copied: {text}");
+    expect(t("n.firstMatches")).toBe("First {n} matches");
   });
 
   it("英文区分单复数，中文不区分", () => {
     setLanguage("en");
-    expect([matchesLabel(1), matchesLabel(6), filesLabel(1), filesLabel(2)]).toEqual(["1 match", "6 matches", "1 file", "2 files"]);
+    expect([matchesLabel(1), matchesLabel(6)]).toEqual(["1 match", "6 matches"]);
     setLanguage("zh");
-    expect([matchesLabel(1), matchesLabel(6), filesLabel(1), filesLabel(2)]).toEqual(["1 处", "6 处", "1 个文件", "2 个文件"]);
+    expect([matchesLabel(1), matchesLabel(6)]).toEqual(["1 处", "6 处"]);
   });
 
   it("状态栏文字随语言变", () => {

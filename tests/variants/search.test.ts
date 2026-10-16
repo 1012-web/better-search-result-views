@@ -156,9 +156,8 @@ describe("其他", () => {
 
 describe("设置", () => {
   it("缺项与错值退回默认", () => {
-    const s = normalizeVariantSettings({ scope: "奇怪", maxResults: 99999, options: { ignorePunct: true, variants: "是" } });
-    expect(s.scope).toBe("vault");
-    expect(s.maxResults).toBe(5000);
+    const s = normalizeVariantSettings({ nativeEnhance: "是", options: { ignorePunct: true, variants: "是" } });
+    expect(s.nativeEnhance).toBe(true);
     expect(s.options.ignorePunct).toBe(true);
     expect(s.options.variants).toBe(true);
     expect(s.unihanTradSimp).toBe(true);
