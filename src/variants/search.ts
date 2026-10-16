@@ -270,6 +270,22 @@ function headingIndexAt(heads: Heading[], offset: number): number {
   return found;
 }
 
+/** 一篇正文的标题索引：问某个位置落在哪条标题链下（给 Obsidian 自带搜索的结果加树形用，纯函数） */
+export interface HeadingIndex {
+  trailAt(offset: number): TrailItem[];
+}
+
+export function buildHeadingIndex(text: string): HeadingIndex {
+  const heads = headings(text);
+  const trails = headingTrails(heads);
+  return {
+    trailAt(offset: number): TrailItem[] {
+      const index = headingIndexAt(heads, offset);
+      return index >= 0 ? trails[index] : [];
+    }
+  };
+}
+
 /** 有序数组里最后一个 key ≤ offset 的元素 */
 function lastAtOrBefore<T>(items: T[], offset: number, key: (item: T) => number): T | null {
   let low = 0;

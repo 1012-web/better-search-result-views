@@ -246,3 +246,55 @@
   outline: 2px solid var(--interactive-accent);
   outline-offset: 1px;
 }
+
+/* Obsidian 自带搜索的树形显示（实验性，设置里打开才生效） */
+.bsrv-sr-match {
+  margin-inline-start: calc(var(--bsrv-depth, 0) * 0.8em);
+}
+
+.bsrv-sr-rows {
+  margin-bottom: 0.25em;
+}
+
+.bsrv-sr-node {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  margin-inline-start: calc((var(--bsrv-row, 0) - var(--bsrv-depth, 0)) * 0.8em);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  cursor: pointer;
+}
+
+.bsrv-sr-node:hover {
+  color: var(--text-normal);
+}
+
+.bsrv-sr-node::before {
+  content: "";
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 0.3em solid transparent;
+  border-right: 0.3em solid transparent;
+  border-top: 0.4em solid var(--text-faint);
+  transition: transform 0.1s;
+}
+
+.bsrv-sr-node.is-collapsed::before {
+  transform: rotate(-90deg);
+}
+
+.bsrv-sr-node.is-hidden {
+  display: none;
+}
+
+/* 整条结果都藏起来时连它自己的内边距也不占位 */
+.bsrv-sr-gone {
+  display: none;
+}
+
+/* 折叠后只留标题行：命中的上下文（原生的子元素）全藏起来 */
+.bsrv-sr-body-hidden > :not(.bsrv-sr-rows) {
+  display: none;
+}

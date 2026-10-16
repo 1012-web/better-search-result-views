@@ -34,7 +34,16 @@
 
 ## 致谢
 
-树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，也不改动 Obsidian 自带的搜索、反向链接和嵌入查询，而是自己绘制面板。
+树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，自己的两个面板是自己绘制的；只有在设置里打开「Obsidian 自带搜索的树形显示（实验性）」时，才会读取并装饰自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
+
+## 实验性：Obsidian 自带搜索的树形显示
+
+设置里的「Obsidian 自带搜索的树形显示（实验性）」默认关闭。打开后，Obsidian 自带「搜索」面板里的每条结果前会补上它所在的标题行，按层级缩进，点标题行可折叠或展开它下面的结果。
+
+- 不改变自带搜索的匹配方式和结果内容，只在结果前加标题行、控制显示。
+- **它读取自带搜索面板的内部结构**（Obsidian 没有为此提供公开接口），所以 Obsidian 升级后可能失效。失效或出错时会自动撤销并停用，不影响本插件的其他功能。
+- 关掉这个开关会立即还原成原样。
+- 折叠状态只在当前搜索面板里记着，不写入文件。
 
 ## 数据与许可
 
@@ -63,4 +72,4 @@ Search tools for people who work with Chinese historical texts in Obsidian. An i
 
 No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). MIT licence; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
 
-Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and does not change Obsidian's built-in search, backlinks or embedded queries; it draws its own panels.
+Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) adds heading levels and folding to the results of Obsidian's built-in Search; it reads that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.

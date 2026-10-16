@@ -14,6 +14,7 @@ import { VARIANT_SEARCH_VIEW, VariantSearchView } from "./ui/searchView";
 import { renderVariantsSettings } from "./ui/settingsTab";
 import { revealRange } from "./ui/navigate";
 import { t } from "../i18n";
+import { NativeSearchTree } from "../native/nativeTree";
 
 export interface FileHit extends Hit {
   path: string;
@@ -48,11 +49,16 @@ export default class VariantsModule extends PluginModule {
   private tokenCache = new Map<string, { mtime: number; size: number; key: string; text: string; tokens: Tokens }>();
   /** 最近打开的正文：面板在侧栏里拿到焦点后，「当前文件」「当前文件夹」按它算 */
   private lastMarkdown: string | null = null;
+  private nativeTree!: NativeSearchTree;
 
   async onload(): Promise<void> {
     this.settings = normalizeVariantSettings(await this.loadData());
     this.registerView(VARIANT_SEARCH_VIEW, (leaf) => new VariantSearchView(leaf, this));
     this.registerCommands();
+    this.nativeTree = new NativeSearchTree(this.app);
+    this.registerEvent(this.app.workspace.on("layout-change", () => this.nativeTree.sync()));
+    this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.nativeTree.sync()));
+    this.nativeTree.setEnabled(this.settings.nativeTree);
     this.addRibbonIcon("search", t("cmd.search"), () => void this.openView());
 
     this.rememberActive();
@@ -66,11 +72,19 @@ export default class VariantsModule extends PluginModule {
   }
 
   onunload(): void {
+    this.nativeTree.setEnabled(false);
     this.tokenCache.clear();
   }
 
   renderSettings(containerEl: HTMLElement): void {
     renderVariantsSettings(containerEl, this);
+  }
+
+  /** 打开或关闭「给 Obsidian 自带搜索的结果加标题分层」 */
+  async setNativeTree(enabled: boolean): Promise<void> {
+    this.settings.nativeTree = enabled;
+    this.nativeTree.setEnabled(enabled);
+    await this.saveSettings();
   }
 
   async saveSettings(): Promise<void> {
@@ -79,6 +93,7 @@ export default class VariantsModule extends PluginModule {
 
   async onExternalDataChange(data: unknown): Promise<void> {
     this.settings = normalizeVariantSettings(data);
+    this.nativeTree.setEnabled(this.settings.nativeTree);
     this.invalidateTable();
   }
 
