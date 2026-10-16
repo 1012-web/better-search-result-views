@@ -1,0 +1,10 @@
+/* 三处树形显示（侧栏、文内查找、自带搜索）共用的尺寸与颜色 */
+.bsrv-vs,
+.bsrv-find,
+.bsrv-sr-wrap {
+  /* 每深一层缩进多少；竖线落在上一层折叠箭头的正下方 */
+  --bsrv-step: 1.3em;
+  --bsrv-guide: var(--background-modifier-border-hover, var(--background-modifier-border));
+  --bsrv-card-bg: var(--background-primary);
+  --bsrv-card-border: var(--background-modifier-border);
+}

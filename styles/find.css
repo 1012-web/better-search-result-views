@@ -289,28 +289,51 @@ button.bsrv-find-toggle:disabled {
 }
 
 /* 树形显示：标题链 → 命中所在的段落卡片 */
+.bsrv-find-list.is-tree {
+  /* em 的基准：标题行、子区域、竖线都按它算，才对得齐 */
+  padding: 0.3em 0.5em 0.5em;
+  font-size: var(--font-ui-small);
+}
+
 .bsrv-find-node-head {
   display: flex;
   align-items: center;
-  gap: 0.4em;
-  padding: 0.25em 0.7em;
-  color: var(--text-muted);
-  font-size: var(--font-ui-small);
+  gap: 0.3em;
+  padding: 0.35em 0.2em;
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  font-weight: var(--font-medium);
+  line-height: 1.35;
   cursor: pointer;
 }
 
-.bsrv-find-node-head::before {
-  content: "";
+.bsrv-find-node-head:hover .bsrv-find-node-title {
+  color: var(--text-accent);
+}
+
+/* 折叠箭头和级别图标各占一格，箭头的中心正好是下面竖线的位置 */
+.bsrv-find-chevron,
+.bsrv-find-level {
+  display: inline-flex;
   flex: none;
-  width: 0;
-  height: 0;
-  border-left: 0.3em solid transparent;
-  border-right: 0.3em solid transparent;
-  border-top: 0.4em solid var(--text-faint);
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  color: var(--text-faint);
+}
+
+.bsrv-find-chevron svg,
+.bsrv-find-level svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bsrv-find-chevron {
   transition: transform 0.1s;
 }
 
-.bsrv-find-node.is-collapsed > .bsrv-find-node-head::before {
+.bsrv-find-node.is-collapsed > .bsrv-find-node-head .bsrv-find-chevron {
   transform: rotate(-90deg);
 }
 
@@ -330,25 +353,32 @@ button.bsrv-find-toggle:disabled {
 }
 
 .bsrv-find-node-body {
-  margin-left: 0.7em;
-  padding-left: 0.4em;
-  border-left: 1px solid var(--background-modifier-border);
+  /* 卡片的下外边距留在里面，左边框才不会在结果之间断开 */
+  display: flow-root;
+  margin-inline-start: 0.7em;
+  padding-inline-start: calc(var(--bsrv-step) - 0.7em - 1px);
+  border-inline-start: 1px solid var(--bsrv-guide);
 }
 
+/* 命中的上下文卡片：用笔记的正文字体，字号放大一档，行距放松 */
 .bsrv-find-card {
   display: flex;
   align-items: baseline;
   gap: 0.6em;
-  margin: 0.2em 0.4em 0.2em 0;
-  padding: 0.4em 0.6em;
-  border: 1px solid var(--background-modifier-border);
+  margin: 0.1em 0.2em 0.55em 0;
+  padding: 0.6em 0.85em;
+  border: 1px solid var(--bsrv-card-border);
   border-radius: var(--radius-m);
-  background: var(--background-primary-alt);
+  background: var(--bsrv-card-bg);
+  color: var(--text-normal);
+  font-family: var(--font-text);
+  font-size: var(--font-ui-medium);
+  line-height: 1.6;
   cursor: pointer;
 }
 
 .bsrv-find-card:hover {
-  background: var(--background-modifier-hover);
+  border-color: var(--background-modifier-border-hover, var(--bsrv-card-border));
 }
 
 .bsrv-find-card.is-current {
@@ -359,7 +389,7 @@ button.bsrv-find-toggle:disabled {
   overflow: visible;
   white-space: normal;
   text-overflow: clip;
-  line-height: 1.6;
+  font-size: inherit;
 }
 
 .bsrv-find-text mark.is-current-mark {

@@ -6,6 +6,7 @@
  */
 import { ItemView, Notice, Platform, setIcon, type WorkspaceLeaf } from "obsidian";
 import type VariantsModule from "../main";
+import { headingIconName } from "../../shared/headingIcon";
 import { buildTrailTree, groupByBlock, type TreeNode } from "../../shared/resultTree";
 import type { SearchOptions, TrailItem } from "../search";
 import type { SearchScope } from "../settings";
@@ -237,10 +238,11 @@ export class VariantSearchView extends ItemView {
   }
 
   /** 一个可折叠的结点：标题行（折叠箭头、标题、命中数）加下面的内容区；返回内容区 */
-  private createCollapsible(parent: HTMLElement, title: string, count: number, headCls: string): HTMLElement {
+  private createCollapsible(parent: HTMLElement, title: string, count: number, headCls: string, level?: number): HTMLElement {
     const wrap = parent.createDiv({ cls: "bsrv-vs-node" });
     const head = wrap.createDiv({ cls: `bsrv-vs-node-head ${headCls}` });
     setIcon(head.createSpan({ cls: "bsrv-vs-collapse" }), "chevron-down");
+    if (level !== undefined) setIcon(head.createSpan({ cls: "bsrv-vs-level", attr: { "aria-label": `H${level}` } }), headingIconName(level));
     head.createSpan({ cls: "bsrv-vs-node-title", text: title });
     head.createSpan({ cls: "bsrv-vs-node-count", text: String(count) });
     head.addEventListener("click", () => wrap.toggleClass("is-collapsed", !wrap.hasClass("is-collapsed")));
@@ -248,7 +250,7 @@ export class VariantSearchView extends ItemView {
   }
 
   private renderNode(parent: HTMLElement, node: TreeNode<IndexedHit>): void {
-    const body = this.createCollapsible(parent, node.title || t("common.noHeading"), node.count, "bsrv-vs-heading");
+    const body = this.createCollapsible(parent, node.title || t("common.noHeading"), node.count, "bsrv-vs-heading", node.level);
     this.renderHits(body, node.hits);
     for (const child of node.children) this.renderNode(body, child);
   }

@@ -10,6 +10,7 @@
  * 任何一处对不上或出错，就整个撤销并停用，不影响别的功能。
  */
 import { setIcon, type App, type WorkspaceLeaf } from "obsidian";
+import { headingIconName } from "../shared/headingIcon";
 import { buildHeadingIndex, type HeadingIndex } from "../variants/search";
 import { planMatches, visibilityOf, type MatchPlan } from "./plan";
 
@@ -215,7 +216,7 @@ export class NativeSearchTree {
       const node = parent.createDiv({ cls: "bsrv-sr-node" });
       const head = node.createDiv({ cls: "bsrv-sr-head" });
       setIcon(head.createSpan({ cls: "bsrv-sr-chevron" }), "chevron-down");
-      setIcon(head.createSpan({ cls: "bsrv-sr-level", attr: { "aria-label": `H${row.item.level}` } }), `heading-${Math.min(6, Math.max(1, row.item.level))}`);
+      setIcon(head.createSpan({ cls: "bsrv-sr-level", attr: { "aria-label": `H${row.item.level}` } }), headingIconName(row.item.level));
       head.createSpan({ cls: "bsrv-sr-title", text: row.item.title });
       head.addEventListener("click", (event) => {
         // 点标题行只管折叠，不要让自带搜索当成点了这条结果而跳去打开文件

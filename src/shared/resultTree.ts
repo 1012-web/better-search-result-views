@@ -8,6 +8,8 @@ export interface TreeNode<T> {
   /** 标题在原文里的起点，同一文件里唯一 */
   key: number;
   title: string;
+  /** 几级标题（1 到 6） */
+  level: number;
   /** 直接挂在这个标题下的命中 */
   hits: T[];
   children: TreeNode<T>[];
@@ -38,7 +40,7 @@ export function buildTrailTree<T extends { trail: readonly TrailItem[] }>(hits: 
     stack.length = shared;
     for (let depth = shared; depth < hit.trail.length; depth++) {
       const item = hit.trail[depth];
-      const node: TreeNode<T> = { key: item.from, title: item.title, hits: [], children: [], count: 0 };
+      const node: TreeNode<T> = { key: item.from, title: item.title, level: item.level, hits: [], children: [], count: 0 };
       (depth === 0 ? children : stack[depth - 1].children).push(node);
       stack.push(node);
     }

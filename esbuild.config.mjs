@@ -5,7 +5,7 @@ import process from "node:process";
 const production = process.argv[2] === "production";
 
 // 两个部分的样式分文件维护，构建时拼成 Obsidian 要的单个 styles.css。
-const STYLES = ["variants.css", "find.css"];
+const STYLES = ["tokens.css", "variants.css", "find.css"];
 function buildStyles() {
   const parts = STYLES.map((name) => `/* ==== ${name} ==== */\n${readFileSync(`styles/${name}`, "utf8").trimEnd()}\n`);
   mkdirSync("dist", { recursive: true });
