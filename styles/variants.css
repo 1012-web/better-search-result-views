@@ -391,73 +391,76 @@
   display: none;
 }
 
-/* 自带搜索面板里的「搜索选项」区：一直显示的勾选框，可以收起 */
+/* 自带搜索 ⚙ 菜单里新增的「搜索增强」一组：和原有的三个开关隔一条线，标明是本插件加的 */
 .bsrv-sr-options {
-  margin: 0 0 0.4em;
-  padding: 0.2em 0.1em 0.4em;
-  border-bottom: 1px solid var(--background-modifier-border);
+  margin: 0.5em 0 0.3em;
+  padding: 0.7em 0.3em 0.2em;
+  border-top: 1px solid var(--background-modifier-border);
   font-size: var(--font-ui-small);
 }
 
 .bsrv-sr-options-head {
   display: flex;
   align-items: center;
-  gap: 0.3em;
-  padding: 0.15em 0.2em;
-  color: var(--text-muted);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-}
-
-.bsrv-sr-options-head:hover {
+  gap: 0.6em;
+  margin-bottom: 0.6em;
   color: var(--text-normal);
+  font-weight: var(--font-medium);
 }
 
-.bsrv-sr-options-chevron {
-  display: inline-flex;
-  width: 1em;
-  height: 1em;
-  color: var(--text-faint);
-  transition: transform 0.1s;
-}
-
-.bsrv-sr-options-chevron svg {
-  width: 100%;
-  height: 100%;
-}
-
-.bsrv-sr-options.is-collapsed .bsrv-sr-options-chevron {
-  transform: rotate(-90deg);
-}
-
-.bsrv-sr-options.is-collapsed .bsrv-sr-options-body {
-  display: none;
+.bsrv-sr-badge {
+  padding: 0 0.6em;
+  border-radius: var(--radius-s);
+  background: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
+  color: var(--text-accent);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-normal);
+  line-height: 1.7;
 }
 
 .bsrv-sr-options-body {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35em 1em;
-  padding: 0.25em 0.3em 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5em 0.8em;
 }
 
 .bsrv-sr-option {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.35em;
+  gap: 0.45em;
   color: var(--text-normal);
-  white-space: nowrap;
   cursor: pointer;
 }
 
 .bsrv-sr-options-hint {
   display: none;
-  flex-basis: 100%;
+  margin-top: 0.6em;
   color: var(--text-faint);
   font-size: var(--font-ui-smaller);
-  white-space: normal;
 }
 
 .bsrv-sr-options-hint.is-shown {
   display: block;
+}
+
+.bsrv-sr-options-provider {
+  margin-top: 0.6em;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+/* ⚙ 按钮上的小圆点：有搜索增强选项在起作用 */
+.bsrv-sr-dot {
+  position: relative;
+}
+
+.bsrv-sr-dot::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--interactive-accent);
 }

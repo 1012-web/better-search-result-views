@@ -1,6 +1,7 @@
 /**
- * Obsidian 自带搜索面板的「搜索选项」（实验性，默认关闭）：
- * 在搜索框下面放一块一直显示的勾选框（异体字等同、跨页码与折行……），
+ * Obsidian 自带搜索面板的「搜索增强」（实验性，默认关闭）：
+ * 在搜索框右边 ⚙ 打开的菜单里、原有的三个开关下面，加一组勾选框（异体字等同、跨页码与折行……），
+ * 标明是本插件新增的；有选项在起作用时，⚙ 按钮上亮一个小圆点。
  * 并在自带搜索「开始搜索」时，把搜索框里的普通词按勾选翻译成正则再交给它的解析器。
  * 搜索框里显示的字、保存下来的搜索都不变，只有实际执行的那一刻不一样。
  *
@@ -10,26 +11,32 @@
  * 所以还要接管搜索框的变化回调：打了字就按它原来的做法（清焦点、停旧搜索、下一拍重搜）自己调一次 startSearch。
  * 对不上（方法不在、找不到搜索框那一行、没有变化回调）就不接，不影响别的功能。
  */
-import { setIcon, type App, type WorkspaceLeaf } from "obsidian";
+import type { App, WorkspaceLeaf } from "obsidian";
 import { t } from "../i18n";
 import { OPTION_LABELS } from "../shared/optionLabels";
 import type { VariantTable } from "../shared/variants";
 import type { SearchOptions } from "../variants/search";
 import { rewriteQuery } from "./rewrite";
 
-/** 选项区要用到的外部状态：当前勾选、异体对照表、折叠状态、存盘 */
+/** 选项区要用到的外部状态：当前勾选、异体对照表、是否已经自动展开过菜单、存盘 */
 export interface NativeQueryHost {
   options(): SearchOptions;
   /** 已经建好的异体对照表；还没建好时为 null */
   table(): VariantTable | null;
   ensureTable(): Promise<unknown>;
-  collapsed(): boolean;
-  setCollapsed(collapsed: boolean): void;
+  /** 第一次启用时自动把 ⚙ 菜单展开过一次了吗 */
+  introduced(): boolean;
+  markIntroduced(): void;
   save(): void;
 }
 
 interface SearchViewLike {
   containerEl: HTMLElement;
+  /** ⚙ 菜单（原有的三个开关所在的容器）和打开它的按钮 */
+  searchParamsContainerEl?: HTMLElement;
+  filterSectionToggleEl?: HTMLElement;
+  showParams?: boolean;
+  toggleFilterSection?: () => void;
   searchComponent?: { getValue?: () => string; changeCallback?: (value: string) => void };
   dom?: { setFocusedItem?: (item: unknown) => void };
   startSearch?: () => void;
@@ -41,6 +48,12 @@ interface Mounted {
   block: HTMLElement;
   hint: HTMLElement;
   unpatch: () => void;
+}
+
+/** 跨窗口也靠得住的元素判断（弹出窗口里的元素不是主窗口那个 HTMLElement 的实例） */
+function isElement(value: unknown): value is HTMLElement {
+  const candidate = value as { instanceOf?: (type: unknown) => boolean } | null | undefined;
+  return !!candidate && typeof candidate.instanceOf === "function" && candidate.instanceOf(HTMLElement);
 }
 
 export class NativeSearchQuery {
@@ -78,16 +91,22 @@ export class NativeSearchQuery {
   }
 
   private mount(leaf: WorkspaceLeaf, view: SearchViewLike): void {
-    const anchor = view.containerEl?.querySelector<HTMLElement>(":scope > .search-row");
-    if (!anchor || typeof view.startSearch !== "function" || typeof view.searchComponent?.getValue !== "function" || typeof view.searchComponent?.changeCallback !== "function") return;
+    const anchor = view.searchParamsContainerEl;
+    if (!isElement(anchor) || typeof view.startSearch !== "function" || typeof view.searchComponent?.getValue !== "function" || typeof view.searchComponent?.changeCallback !== "function") return;
     try {
       const block = this.buildBlock(view);
-      anchor.after(block);
+      anchor.append(block);
       const hint = block.querySelector<HTMLElement>(".bsrv-sr-options-hint");
       if (!hint) return;
       const mounted: Mounted = { view, block, hint, unpatch: () => undefined };
       mounted.unpatch = this.patchStartSearch(view, mounted);
       this.mounted.set(leaf, mounted);
+      this.updateDot(view);
+      // 菜单默认是收起的：第一次启用时替用户展开一次，让他看到新增的这组选项；之后听用户自己的
+      if (!this.host.introduced()) {
+        if (!view.showParams) view.toggleFilterSection?.();
+        this.host.markIntroduced();
+      }
     } catch (error) {
       console.error("[bsrv] Search options for Obsidian search failed and were turned off", error);
       this.broken = true;
@@ -100,6 +119,7 @@ export class NativeSearchQuery {
     if (!mounted) return;
     mounted.unpatch();
     mounted.block.remove();
+    mounted.view.filterSectionToggleEl?.removeClass("bsrv-sr-dot");
     this.mounted.delete(leaf);
     if (rerun) mounted.view.startSearch?.();
   }
@@ -110,15 +130,9 @@ export class NativeSearchQuery {
 
   private buildBlock(view: SearchViewLike): HTMLElement {
     const block = createDiv({ cls: "bsrv-sr-options" });
-    block.toggleClass("is-collapsed", this.host.collapsed());
     const head = block.createDiv({ cls: "bsrv-sr-options-head" });
-    setIcon(head.createSpan({ cls: "bsrv-sr-options-chevron" }), "chevron-down");
     head.createSpan({ text: t("ns.title") });
-    head.addEventListener("click", () => {
-      const collapsed = !block.hasClass("is-collapsed");
-      block.toggleClass("is-collapsed", collapsed);
-      this.host.setCollapsed(collapsed);
-    });
+    head.createSpan({ cls: "bsrv-sr-badge", text: t("ns.badge") });
     const body = block.createDiv({ cls: "bsrv-sr-options-body" });
     const options = this.host.options();
     for (const { key, label, title } of OPTION_LABELS) {
@@ -129,11 +143,20 @@ export class NativeSearchQuery {
       check.addEventListener("change", () => {
         this.host.options()[key] = check.checked;
         this.host.save();
+        this.updateDot(view);
         view.startSearch?.();
       });
     }
-    body.createDiv({ cls: "bsrv-sr-options-hint", text: t("ns.skipped") });
+    block.createDiv({ cls: "bsrv-sr-options-hint", text: t("ns.skipped") });
+    block.createDiv({ cls: "bsrv-sr-options-provider", text: t("ns.provider") });
     return block;
+  }
+
+  /** ⚙ 按钮上的小圆点：有选项在起作用时亮着，不用点开菜单也看得出搜索被改过 */
+  private updateDot(view: SearchViewLike): void {
+    const options = this.host.options();
+    const on = options.variants || options.crossAnchors || options.crossMarkup || options.ignorePunct || options.titlesOnly;
+    view.filterSectionToggleEl?.toggleClass("bsrv-sr-dot", on);
   }
 
   /** 把这个面板的 startSearch 包一层：执行期间 getValue 返回翻译后的查询，执行完还原。返回撤销函数 */

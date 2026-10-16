@@ -19,8 +19,8 @@ export interface VariantSettings {
   resultView: ResultView;
   /** 增强 Obsidian 自带搜索：在搜索框下加选项区（按勾选改写查询），结果加标题分层（实验性，默认关） */
   nativeEnhance: boolean;
-  /** 自带搜索里的选项区是否收起 */
-  nativeOptionsCollapsed: boolean;
+  /** 第一次启用增强时，是否已经替用户把自带搜索的 ⚙ 菜单自动展开过一次 */
+  nativeMenuIntroduced: boolean;
   /** 最多列出几处命中 */
   maxResults: number;
 }
@@ -36,7 +36,7 @@ export const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   scope: "vault",
   resultView: "tree",
   nativeEnhance: false,
-  nativeOptionsCollapsed: false,
+  nativeMenuIntroduced: false,
   maxResults: 500
 };
 
@@ -60,7 +60,7 @@ export function normalizeVariantSettings(raw: unknown): VariantSettings {
     scope,
     resultView: source.resultView === "compact" || source.resultView === "tree" ? source.resultView : DEFAULT_VARIANT_SETTINGS.resultView,
     nativeEnhance: bool(source.nativeEnhance, DEFAULT_VARIANT_SETTINGS.nativeEnhance),
-    nativeOptionsCollapsed: bool(source.nativeOptionsCollapsed, DEFAULT_VARIANT_SETTINGS.nativeOptionsCollapsed),
+    nativeMenuIntroduced: bool(source.nativeMenuIntroduced, DEFAULT_VARIANT_SETTINGS.nativeMenuIntroduced),
     maxResults: Math.min(5000, Math.max(20, max))
   };
 }

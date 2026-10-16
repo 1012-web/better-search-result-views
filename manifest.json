@@ -1,6 +1,6 @@
 {
   "id": "better-search-result-views",
-  "name": "Better Search Result Views 汉字检索",
+  "name": "Better Search Result Views 更好的搜索结果展示",
   "version": "0.1.0",
   "minAppVersion": "1.13.7",
   "description": "在笔记或整个库里查找文字：异体字当同一个字找，词被页码标记、换行或标签切开也找得到，结果可按标题归成树形.",

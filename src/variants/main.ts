@@ -62,9 +62,9 @@ export default class VariantsModule extends PluginModule {
       options: () => this.settings.options,
       table: () => this.built?.table ?? null,
       ensureTable: () => this.table(),
-      collapsed: () => this.settings.nativeOptionsCollapsed,
-      setCollapsed: (collapsed) => {
-        this.settings.nativeOptionsCollapsed = collapsed;
+      introduced: () => this.settings.nativeMenuIntroduced,
+      markIntroduced: () => {
+        this.settings.nativeMenuIntroduced = true;
         void this.saveSettings();
       },
       save: () => void this.saveSettings()

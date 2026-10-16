@@ -1,4 +1,4 @@
-# Better Search Result Views（汉字检索）
+# Better Search Result Views（更好的搜索结果展示）
 
 给在 Obsidian 里整理古籍、史料转写的人用的检索插件。本插件独立开发，与 [Better Search Views](https://github.com/ivan-lednev/better-search-views) 没有隶属关系，参考关系见文末「致谢」。
 
@@ -34,15 +34,27 @@
 
 ## 致谢
 
-树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，自己的两个面板是自己绘制的；只有在设置里打开「Obsidian 自带搜索的树形显示（实验性）」时，才会读取并装饰自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
+树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，自己的两个面板是自己绘制的；只有在设置里打开「增强 Obsidian 自带搜索（实验性）」时，才会读取并改动自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
 
-## 实验性：Obsidian 自带搜索的树形显示
+## 实验性：增强 Obsidian 自带搜索
 
-设置里的「Obsidian 自带搜索的树形显示（实验性）」默认关闭。打开后，Obsidian 自带「搜索」面板里的每条结果前会补上它所在的标题行，按层级缩进，点标题行可折叠或展开它下面的结果。
+设置里的「增强 Obsidian 自带搜索（实验性）」默认关闭。打开后，Obsidian 自带的「搜索」面板有两处变化：
 
-- 不改变自带搜索的匹配方式和结果内容，只在结果前加标题行、控制显示。
-- **它读取自带搜索面板的内部结构**（Obsidian 没有为此提供公开接口），所以 Obsidian 升级后可能失效。失效或出错时会自动撤销并停用，不影响本插件的其他功能。
+- **搜索增强选项。** 在搜索框右边 ⚙ 打开的菜单里，原有的三个开关下面多出一组「搜索增强」（标着「本插件新增」）：异体字等同、跨页码与折行、跨标注与注释、忽略标点、只搜标题。有选项在起作用时，⚙ 按钮上会亮一个小圆点。第一次打开这个功能时，菜单会替你展开一次，之后听你自己的。
+- **标题树。** 每条结果前补上它所在的标题行，按层级缩进，点标题行可折叠或展开它下面的结果。
+
+它是怎么起作用的：
+
+- 勾选的选项只在**搜索的那一刻**把你输入的词改写成 Obsidian 搜索认得的正则，搜索框里的字不动，保存下来的搜索也不变。
+- 只改写普通的词和引号短语。`path:`、`tag:`、`file:`、`line:` 这类操作符，自己写的 `/正则/`、`[属性]`、`OR`、括号、排除符 `-` 原样保留；面板会提示这部分不受选项影响。
+- 这组选项和侧栏面板共用同一份勾选。
+- 它是用正则去近似本插件自己面板的匹配规则，自己的面板仍是最精确的。
+
+要知道的限制：
+
+- **它读取并改动自带搜索面板的内部结构**（Obsidian 没有为此提供公开接口），所以 Obsidian 升级后可能失效。对不上或出错时会自动撤销并停用，不影响本插件的其他功能。
 - 关掉这个开关会立即还原成原样。
+- 「只搜标题」用到后行断言；老 iOS（16.4 以前）不认，那里会退回把标题标记也算进命中的写法。
 - 折叠状态只在当前搜索面板里记着，不写入文件。
 
 ## 数据与许可
@@ -72,4 +84,4 @@ Search tools for people who work with Chinese historical texts in Obsidian. An i
 
 No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). MIT licence; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
 
-Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) adds heading levels and folding to the results of Obsidian's built-in Search; it reads that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.
+Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, marked as added by this plugin, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.
