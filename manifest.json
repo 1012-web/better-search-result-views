@@ -1,6 +1,6 @@
 {
   "id": "better-search-result-views",
-  "name": "Better Search Result Views 更好的搜索结果展示",
+  "name": "Better Search Result Views",
   "version": "0.1.0",
   "minAppVersion": "1.13.7",
   "description": "Show search results grouped under their headings, in find in note and in the built-in search, and still find words split by line breaks, tags or page markers.",
