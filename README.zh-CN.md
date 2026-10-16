@@ -1,4 +1,4 @@
-# 更好的搜索结果展示
+# Better Search Result Views·更好的搜索结果展示
 
 [English](README.md)
 
