@@ -1,5 +1,7 @@
 # Better Search Result Views（更好的搜索结果展示）
 
+*Search results grouped under their headings, in find in note and in Obsidian's built-in search.*　[English documentation](README.en.md)
+
 本插件优化了 Obsidian 的搜索结果展示，分两处：
 
 - **文内查找优化：统一展示文内搜索结果。** 在笔记里按 `Ctrl+F`（可选接管），浮出一个面板，把全部命中按标题层级列出来，可折叠；点哪条，正文就跳到哪处并高亮。自带的 `Ctrl+F` 一次只标出一处，要靠上下箭头逐处翻。面板上可在树形和紧凑（一处一行）之间切换。
@@ -59,7 +61,7 @@
 
 ## 致谢
 
-树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，自己的两个面板是自己绘制的；只有开着设置里的「增强 Obsidian 自带搜索」时（默认开启），才会读取并改动自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
+树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，文内查找面板是自己绘制的；只有开着设置里的「增强 Obsidian 自带搜索」时（默认开启），才会读取并改动自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
 
 ## 增强 Obsidian 自带搜索
 
@@ -94,34 +96,3 @@ npm test
 npx eslint src  # 官方的 Obsidian 审查规则
 npm run unihan -- <Unihan.zip>   # 重新生成 Unihan 对照表
 ```
-
----
-
-# Better Search Result Views (English summary)
-
-This plugin improves how Obsidian shows search results, in two places:
-
-- **Find in note: all matches in one view.** Press `Ctrl+F` (taking it over is optional) for a floating panel that lists every match under its headings, which fold; click one and the note jumps to it and highlights it. Obsidian's own `Ctrl+F` marks one match at a time. The panel switches between tree and compact (one line per match).
-- **A better built-in sidebar search.** Obsidian's own sidebar Search shows its results as a heading tree, and clicking a result jumps as usual. Its ⚙ menu gets a group of "Search enhancement" options (on by default; switch it off in settings); limit the scope with the built-in `path:` operator. The enhancement brings three things: results grouped under headings; words split by a line break, a `<!--p.12-->` page marker, a tag or a comment are still found; and variant characters such as `鄴` and `邺` count as the same (used for searching only; your notes are never changed).
-
-Variants and page markers are mainly for people who read Chinese historical texts; you can ignore them otherwise. If your notes mark pages like `<!--p.12-->`, the find-in-note panel shows each result's page number.
-
-An independent plugin, not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
-
-No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). In the English interface the variant-character features are hidden by default (turn them on in settings if you read Chinese sources). A short feature guide opens the first time the plugin is enabled; reopen it any time with the command "Show feature guide".
-
-**Page markers.** If your notes mark where a printed page starts with an HTML comment such as `<!--p.12-->` (the number may be negative, and spaces inside the comment are fine), the find-in-note panel shows the page number and words split by the marker are still found. Other styles such as `[p.12]` or `<p12>` are not recognised. Notes without such markers can still be searched and grouped by heading; they just don't show page numbers.
-
-**Find in note.** Same note, same word. Top: Obsidian's own `Ctrl+F`; bottom: this plugin's find in note, with every match under its headings.
-
-![Find in note: one match at a time before, all matches by heading after](assets/guide/find-en.png)
-
-**Built-in sidebar search.** In each pair, left: Obsidian's own search; right: with the "Enhance Obsidian search" setting on (the default). Put a phrase in quotes so Obsidian treats it as one phrase.
-
-![Results grouped by heading: flat before, a tree after](assets/guide/en-tree.png)
-
-![A phrase split by a page marker: 1 match before, 2 after](assets/guide/en-cross.png)
-
-Licence: MIT; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
-
-Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. A setting (on by default, can be switched off) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.
