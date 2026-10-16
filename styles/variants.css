@@ -1,0 +1,150 @@
+/* 异体字检索：侧栏查找面板。颜色走主题变量，深浅主题都看得清 */
+.hist-search-vs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  padding: 0.5em 0.6em;
+}
+
+.hist-search-vs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
+.hist-search-vs-box {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.hist-search-vs-input {
+  width: 100%;
+  padding-right: 2em;
+}
+
+.hist-search-vs-box .hist-search-vs-icon {
+  position: absolute;
+  right: 0.2em;
+}
+
+.hist-search-vs-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 0.9em;
+  font-size: var(--font-ui-small);
+}
+
+.hist-search-vs-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hist-search-vs-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  font-size: var(--font-ui-small);
+}
+
+.hist-search-vs-status {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  white-space: pre-line;
+  border-bottom: 2px solid var(--interactive-accent);
+  padding-bottom: 0.3em;
+}
+
+.hist-search-vs-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.hist-search-vs-file {
+  margin-top: 0.6em;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  word-break: break-all;
+}
+
+.hist-search-vs-row {
+  position: relative;
+  padding: 0.45em 0.3em;
+  border-bottom: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+}
+
+.hist-search-vs-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+.hist-search-vs-row.is-current {
+  background: var(--background-modifier-active-hover);
+}
+
+.hist-search-vs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.hist-search-vs-page {
+  font-weight: var(--font-semibold);
+  color: var(--text-accent);
+}
+
+.hist-search-vs-flag {
+  color: var(--text-warning);
+}
+
+.hist-search-vs-text {
+  margin-top: 0.15em;
+  line-height: 1.6;
+}
+
+/* 底色与文内查找的关键词共用（变量在 find.css 里定义）：Obsidian 1.14 起没有 --text-highlight-bg 了 */
+.hist-search-vs-text mark {
+  background: var(--hist-search-find-key, #c2410c);
+  color: var(--hist-search-find-key-text, #ffffff);
+  border-radius: 3px;
+  mix-blend-mode: normal;
+  font-weight: var(--font-bold);
+  padding: 0 0.1em;
+}
+
+.hist-search-vs-actions {
+  position: absolute;
+  top: 0.3em;
+  right: 0.2em;
+  display: none;
+  gap: 0.1em;
+}
+
+.hist-search-vs-row:hover .hist-search-vs-actions,
+.hist-search-vs-row.is-current .hist-search-vs-actions {
+  display: flex;
+}
+
+/* 手机上没有悬停：操作按钮一直显示 */
+.is-mobile .hist-search-vs-actions {
+  display: flex;
+}
+
+.hist-search-vs-textarea {
+  width: 100%;
+  font-family: var(--font-monospace);
+  margin-bottom: 1em;
+}
+
+.hist-search-vs-sources ul {
+  margin: 0.3em 0 1em;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
