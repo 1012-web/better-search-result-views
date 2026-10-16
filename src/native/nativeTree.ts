@@ -9,7 +9,7 @@
  * 文件上的 content 是全文、vChildren._children 是各条结果，结果上的 start 是位置、el 是元素。
  * 任何一处对不上或出错，就整个撤销并停用，不影响别的功能。
  */
-import type { App, WorkspaceLeaf } from "obsidian";
+import { setIcon, type App, type WorkspaceLeaf } from "obsidian";
 import { buildHeadingIndex, type HeadingIndex } from "../variants/search";
 import { planMatches, visibilityOf, type MatchPlan } from "./plan";
 
@@ -214,6 +214,8 @@ export class NativeSearchTree {
     for (const row of plan.rows) {
       const node = parent.createDiv({ cls: "bsrv-sr-node" });
       const head = node.createDiv({ cls: "bsrv-sr-head" });
+      setIcon(head.createSpan({ cls: "bsrv-sr-chevron" }), "chevron-down");
+      setIcon(head.createSpan({ cls: "bsrv-sr-level", attr: { "aria-label": `H${row.item.level}` } }), `heading-${Math.min(6, Math.max(1, row.item.level))}`);
       head.createSpan({ cls: "bsrv-sr-title", text: row.item.title });
       head.addEventListener("click", (event) => {
         // 点标题行只管折叠，不要让自带搜索当成点了这条结果而跳去打开文件

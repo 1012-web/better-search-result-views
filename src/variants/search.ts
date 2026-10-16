@@ -41,6 +41,8 @@ export interface Candidate {
 export interface TrailItem {
   title: string;
   from: number;
+  /** 几级标题（# 的个数，1 到 6） */
+  level: number;
 }
 
 export interface Hit {
@@ -251,7 +253,7 @@ function headingTrails(heads: Heading[]): TrailItem[][] {
   return heads.map((heading) => {
     while (stack.length && stack[stack.length - 1].level >= heading.level) stack.pop();
     stack.push(heading);
-    return stack.map((item) => ({ title: item.title, from: item.from }));
+    return stack.map((item) => ({ title: item.title, from: item.from, level: item.level }));
   });
 }
 

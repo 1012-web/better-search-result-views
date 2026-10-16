@@ -253,7 +253,7 @@
  * 和上一条结果共用的上层标题，竖线在这条结果里从最上面一路画下来，两段对得上，看起来就是一条。
  */
 .bsrv-sr-wrap {
-  --bsrv-step: 1.1em;
+  --bsrv-step: 1.3em;
   --bsrv-guide: var(--background-modifier-border-hover, var(--background-modifier-border));
   /* 整棵树缩进到文件名的折叠箭头下面 */
   margin-inline-start: 1.1em;
@@ -267,6 +267,8 @@
 .search-result-file-match.bsrv-sr-match {
   /* 不让卡片的外边距顶出去，竖线才不会在结果之间断开 */
   display: flow-root;
+  /* 竖线和缩进都按 em 算：这里定一个字号，标题行、子区域、竖线才对得上 */
+  font-size: var(--font-ui-small);
   margin: 0;
   padding: 0 0 0 calc(var(--bsrv-shared, 0) * var(--bsrv-step));
   border: 0;
@@ -287,32 +289,51 @@
   display: flex;
   align-items: center;
   gap: 0.3em;
-  padding: 0.2em 0.4em;
-  color: var(--text-muted);
+  padding: 0.35em 0.2em;
+  color: var(--text-normal);
+  font-family: var(--font-interface);
   font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  line-height: 1.35;
   cursor: pointer;
 }
 
-.bsrv-sr-head:hover {
-  color: var(--text-normal);
+.bsrv-sr-head:hover .bsrv-sr-title {
+  color: var(--text-accent);
 }
 
-.bsrv-sr-head::before {
-  content: "";
+/* 折叠箭头和级别图标各占一格，箭头的中心正好是下面竖线的位置 */
+.bsrv-sr-chevron,
+.bsrv-sr-level {
+  display: inline-flex;
   flex: none;
-  width: 0;
-  height: 0;
-  border-left: 0.3em solid transparent;
-  border-right: 0.3em solid transparent;
-  border-top: 0.4em solid var(--text-faint);
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  color: var(--text-faint);
+}
+
+.bsrv-sr-chevron svg,
+.bsrv-sr-level svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bsrv-sr-chevron {
   transition: transform 0.1s;
 }
 
-.bsrv-sr-node.is-collapsed > .bsrv-sr-head::before {
+.bsrv-sr-node.is-collapsed > .bsrv-sr-head .bsrv-sr-chevron {
   transform: rotate(-90deg);
 }
 
-/* 子区域的左边框正好落在上一层折叠箭头的正下方，内容再缩进半格到下一层 */
+.bsrv-sr-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 子区域的左边框落在上一层折叠箭头的正下方，内容再缩进到下一层 */
 .bsrv-sr-children {
   /* 卡片的下外边距留在子区域里面，左边框才不会在结果之间断开 */
   display: flow-root;
@@ -325,13 +346,18 @@
   display: none;
 }
 
+/* 命中的上下文卡片：用笔记的正文字体，字号放大一档，行距放松 */
 .bsrv-sr-body {
   position: relative;
-  margin: 0.1em 0.4em 0.4em 0;
-  padding: 0.4em 0.7em;
+  margin: 0.1em 0.4em 0.55em 0;
+  padding: 0.6em 0.85em;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-m);
+  font-family: var(--font-text);
+  font-size: var(--font-ui-medium);
+  line-height: 1.6;
+  color: var(--text-normal);
 }
 
 /* 整条结果都藏起来时连它自己的占位也不要 */
