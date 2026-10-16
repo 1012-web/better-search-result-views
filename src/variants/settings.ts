@@ -17,8 +17,10 @@ export interface VariantSettings {
   scope: SearchScope;
   /** 结果的显示：tree 按文件和标题链归成树，每处带所在段落；compact 一处一行 */
   resultView: ResultView;
-  /** 给 Obsidian 自带搜索的结果加标题分层（实验性，默认关） */
-  nativeTree: boolean;
+  /** 增强 Obsidian 自带搜索：在搜索框下加选项区（按勾选改写查询），结果加标题分层（实验性，默认关） */
+  nativeEnhance: boolean;
+  /** 自带搜索里的选项区是否收起 */
+  nativeOptionsCollapsed: boolean;
   /** 最多列出几处命中 */
   maxResults: number;
 }
@@ -33,7 +35,8 @@ export const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   options: { ...DEFAULT_SEARCH_OPTIONS },
   scope: "vault",
   resultView: "tree",
-  nativeTree: false,
+  nativeEnhance: false,
+  nativeOptionsCollapsed: false,
   maxResults: 500
 };
 
@@ -56,7 +59,8 @@ export function normalizeVariantSettings(raw: unknown): VariantSettings {
     options,
     scope,
     resultView: source.resultView === "compact" || source.resultView === "tree" ? source.resultView : DEFAULT_VARIANT_SETTINGS.resultView,
-    nativeTree: bool(source.nativeTree, DEFAULT_VARIANT_SETTINGS.nativeTree),
+    nativeEnhance: bool(source.nativeEnhance, DEFAULT_VARIANT_SETTINGS.nativeEnhance),
+    nativeOptionsCollapsed: bool(source.nativeOptionsCollapsed, DEFAULT_VARIANT_SETTINGS.nativeOptionsCollapsed),
     maxResults: Math.min(5000, Math.max(20, max))
   };
 }

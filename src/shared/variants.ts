@@ -131,10 +131,15 @@ export function toSearchRegex(query: string, table: VariantTable | null): string
   const parts: string[] = [];
   for (const ch of query) {
     if (/\s/u.test(ch)) continue;
-    const members = (table ? table.members(ch) : [ch]).map(escapeForRegex);
-    if (members.length === 1) parts.push(members[0]);
-    else if (members.some((member) => member.codePointAt(0)! > 0xffff)) parts.push(`(?:${members.join("|")})`);
-    else parts.push(`[${members.join("")}]`);
+    parts.push(charPattern(ch, table));
   }
   return parts.length ? `/${parts.join("")}/` : "";
+}
+
+/** 一个字在正则里的写法：有异体的展开成字符组（含扩展区字时用分支），没有的只转义 */
+export function charPattern(ch: string, table: VariantTable | null): string {
+  const members = (table ? table.members(ch) : [ch]).map(escapeForRegex);
+  if (members.length === 1) return members[0];
+  if (members.some((member) => member.codePointAt(0)! > 0xffff)) return `(?:${members.join("|")})`;
+  return `[${members.join("")}]`;
 }

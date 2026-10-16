@@ -14,6 +14,7 @@ import { VARIANT_SEARCH_VIEW, VariantSearchView } from "./ui/searchView";
 import { renderVariantsSettings } from "./ui/settingsTab";
 import { revealRange } from "./ui/navigate";
 import { t } from "../i18n";
+import { NativeSearchQuery } from "../native/nativeQuery";
 import { NativeSearchTree } from "../native/nativeTree";
 
 export interface FileHit extends Hit {
@@ -50,15 +51,31 @@ export default class VariantsModule extends PluginModule {
   /** 最近打开的正文：面板在侧栏里拿到焦点后，「当前文件」「当前文件夹」按它算 */
   private lastMarkdown: string | null = null;
   private nativeTree!: NativeSearchTree;
+  private nativeQuery!: NativeSearchQuery;
 
   async onload(): Promise<void> {
     this.settings = normalizeVariantSettings(await this.loadData());
     this.registerView(VARIANT_SEARCH_VIEW, (leaf) => new VariantSearchView(leaf, this));
     this.registerCommands();
     this.nativeTree = new NativeSearchTree(this.app);
-    this.registerEvent(this.app.workspace.on("layout-change", () => this.nativeTree.sync()));
-    this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.nativeTree.sync()));
-    this.nativeTree.setEnabled(this.settings.nativeTree);
+    this.nativeQuery = new NativeSearchQuery(this.app, {
+      options: () => this.settings.options,
+      table: () => this.built?.table ?? null,
+      ensureTable: () => this.table(),
+      collapsed: () => this.settings.nativeOptionsCollapsed,
+      setCollapsed: (collapsed) => {
+        this.settings.nativeOptionsCollapsed = collapsed;
+        void this.saveSettings();
+      },
+      save: () => void this.saveSettings()
+    });
+    const syncNative = () => {
+      this.nativeTree.sync();
+      this.nativeQuery.sync();
+    };
+    this.registerEvent(this.app.workspace.on("layout-change", syncNative));
+    this.registerEvent(this.app.workspace.on("active-leaf-change", syncNative));
+    this.applyNativeEnhance();
     this.addRibbonIcon("search", t("cmd.search"), () => void this.openView());
 
     this.rememberActive();
@@ -72,6 +89,7 @@ export default class VariantsModule extends PluginModule {
   }
 
   onunload(): void {
+    this.nativeQuery.setEnabled(false);
     this.nativeTree.setEnabled(false);
     this.tokenCache.clear();
   }
@@ -80,11 +98,16 @@ export default class VariantsModule extends PluginModule {
     renderVariantsSettings(containerEl, this);
   }
 
-  /** 打开或关闭「给 Obsidian 自带搜索的结果加标题分层」 */
-  async setNativeTree(enabled: boolean): Promise<void> {
-    this.settings.nativeTree = enabled;
-    this.nativeTree.setEnabled(enabled);
+  /** 打开或关闭「增强 Obsidian 自带搜索」：搜索选项区 + 结果的标题分层 */
+  async setNativeEnhance(enabled: boolean): Promise<void> {
+    this.settings.nativeEnhance = enabled;
+    this.applyNativeEnhance();
     await this.saveSettings();
+  }
+
+  private applyNativeEnhance(): void {
+    this.nativeTree.setEnabled(this.settings.nativeEnhance);
+    this.nativeQuery.setEnabled(this.settings.nativeEnhance);
   }
 
   async saveSettings(): Promise<void> {
@@ -93,7 +116,7 @@ export default class VariantsModule extends PluginModule {
 
   async onExternalDataChange(data: unknown): Promise<void> {
     this.settings = normalizeVariantSettings(data);
-    this.nativeTree.setEnabled(this.settings.nativeTree);
+    this.applyNativeEnhance();
     this.invalidateTable();
   }
 
@@ -101,6 +124,7 @@ export default class VariantsModule extends PluginModule {
   invalidateTable(): void {
     this.built = null;
     this.building = null;
+    this.nativeQuery?.rerun();
     for (const leaf of this.app.workspace.getLeavesOfType(VARIANT_SEARCH_VIEW)) {
       if (leaf.view instanceof VariantSearchView) leaf.view.refresh();
     }

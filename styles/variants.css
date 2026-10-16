@@ -390,3 +390,74 @@
 .search-result-file-match.bsrv-sr-match.bsrv-sr-gone {
   display: none;
 }
+
+/* 自带搜索面板里的「搜索选项」区：一直显示的勾选框，可以收起 */
+.bsrv-sr-options {
+  margin: 0 0 0.4em;
+  padding: 0.2em 0.1em 0.4em;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: var(--font-ui-small);
+}
+
+.bsrv-sr-options-head {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.15em 0.2em;
+  color: var(--text-muted);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+}
+
+.bsrv-sr-options-head:hover {
+  color: var(--text-normal);
+}
+
+.bsrv-sr-options-chevron {
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  color: var(--text-faint);
+  transition: transform 0.1s;
+}
+
+.bsrv-sr-options-chevron svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bsrv-sr-options.is-collapsed .bsrv-sr-options-chevron {
+  transform: rotate(-90deg);
+}
+
+.bsrv-sr-options.is-collapsed .bsrv-sr-options-body {
+  display: none;
+}
+
+.bsrv-sr-options-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em 1em;
+  padding: 0.25em 0.3em 0;
+}
+
+.bsrv-sr-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  color: var(--text-normal);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bsrv-sr-options-hint {
+  display: none;
+  flex-basis: 100%;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  white-space: normal;
+}
+
+.bsrv-sr-options-hint.is-shown {
+  display: block;
+}

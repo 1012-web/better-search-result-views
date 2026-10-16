@@ -60,7 +60,7 @@ export function renderVariantsSettings(containerEl: HTMLElement, module: Variant
   new Setting(containerEl)
     .setName(t("vset.nativeName"))
     .setDesc(t("vset.nativeDesc"))
-    .addToggle((toggle) => toggle.setValue(s.nativeTree).onChange((value) => module.setNativeTree(value)));
+    .addToggle((toggle) => toggle.setValue(s.nativeEnhance).onChange((value) => module.setNativeEnhance(value)));
 
   const summary = containerEl.createDiv({ cls: "bsrv-vs-sources" });
   renderSources(summary, module);

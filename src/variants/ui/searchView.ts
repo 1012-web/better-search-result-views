@@ -7,8 +7,9 @@
 import { ItemView, Notice, Platform, setIcon, type WorkspaceLeaf } from "obsidian";
 import type VariantsModule from "../main";
 import { headingIconName } from "../../shared/headingIcon";
+import { OPTION_LABELS } from "../../shared/optionLabels";
 import { buildTrailTree, groupByBlock, type TreeNode } from "../../shared/resultTree";
-import type { SearchOptions, TrailItem } from "../search";
+import type { TrailItem } from "../search";
 import type { SearchScope } from "../settings";
 import type { FileHit } from "../main";
 import { filesLabel, matchesLabel, t, type MessageKey } from "../../i18n";
@@ -25,13 +26,6 @@ export const VARIANT_SEARCH_VIEW = "bsrv-variants";
 
 const SEARCH_DELAY = 350;
 
-const OPTION_LABELS: Array<{ key: keyof SearchOptions; label: MessageKey; title: MessageKey }> = [
-  { key: "variants", label: "vs.optVariants", title: "vs.optVariantsTip" },
-  { key: "crossAnchors", label: "vs.optCross", title: "vs.optCrossTip" },
-  { key: "crossMarkup", label: "vs.optMarkup", title: "vs.optMarkupTip" },
-  { key: "ignorePunct", label: "vs.optPunct", title: "vs.optPunctTip" },
-  { key: "titlesOnly", label: "vs.optTitles", title: "vs.optTitlesTip" }
-];
 
 const SCOPE_LABELS: Record<SearchScope, MessageKey> = { file: "scope.file", folder: "scope.folder", vault: "scope.vault" };
 
