@@ -61,7 +61,8 @@ export class WelcomeModal extends Modal {
     const pairs: Array<{ id: GuideId; title: MessageKey; text: MessageKey }> = [
       { id: "cross", title: "welcome.cmpCrossTitle", text: "welcome.cmpCrossText" },
       { id: "variants", title: "welcome.cmpVariantsTitle", text: "welcome.cmpVariantsText" },
-      { id: "tree", title: "welcome.cmpTreeTitle", text: "welcome.cmpTreeText" }
+      { id: "tree", title: "welcome.cmpTreeTitle", text: "welcome.cmpTreeText" },
+      { id: "find", title: "welcome.cmpFindTitle", text: "welcome.cmpFindText" }
     ];
     for (const pair of pairs) {
       const src = images[pair.id];

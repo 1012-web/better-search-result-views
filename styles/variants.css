@@ -408,15 +408,6 @@
   font-weight: var(--font-medium);
 }
 
-.bsrv-sr-badge {
-  padding: 0 0.6em;
-  border-radius: var(--radius-s);
-  background: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
-  color: var(--text-accent);
-  font-size: var(--font-ui-smaller);
-  font-weight: var(--font-normal);
-  line-height: 1.7;
-}
 
 .bsrv-sr-options-body {
   display: grid;

@@ -16,7 +16,7 @@
 
 ## 效果对比
 
-下面三组都是同一份笔记、同一个搜索词的真实截图：左边是 Obsidian 自带搜索，右边是打开设置里的「增强 Obsidian 自带搜索（实验性）」之后。
+下面四组都是同一份笔记、同一个搜索词的真实截图。前三组是侧栏搜索：左边是 Obsidian 自带搜索，右边是打开设置里的「增强 Obsidian 自带搜索（实验性）」之后；第四组是文内查找。
 
 **词被页码标记切开**：搜「威德被于四远」，自带搜索只找到没被切开的那一处；打开后，被 `<!--p.21-->` 页码标记切开的那一处也找到了。
 
@@ -29,6 +29,10 @@
 **按标题归类的结果**：搜「鄴城」，自带搜索把结果平铺；打开后按标题归成树，每个标题都能折叠。
 
 ![按标题归类：之前平铺，之后成树](assets/guide/zh-tree.png)
+
+**文内查找（Ctrl+F）：按标题一览**：同一篇有多级标题的笔记里搜「纳谏」。自带的 Ctrl+F 一次只标出一处，要靠上下箭头逐处跳转；本插件的查找面板把 7 处命中按「卷 → 篇」的标题层级列出来，一眼看全篇，点哪处跳哪处。（这一组上下排开：上面是自带，下面是本插件。）
+
+![文内查找：自带 Ctrl+F 一次一处，本插件按标题一览](assets/guide/find-zh.png)
 
 ## 使用
 
@@ -60,7 +64,7 @@
 
 设置里的「增强 Obsidian 自带搜索（实验性）」默认关闭。打开后，Obsidian 自带的「搜索」面板有两处变化：
 
-- **搜索增强选项。** 在搜索框右边 ⚙ 打开的菜单里，原有的三个开关下面多出一组「搜索增强」（标着「本插件新增」）：异体字等同、跨页码与折行、跨标注与注释、忽略标点、只搜标题。有选项在起作用时，⚙ 按钮上会亮一个小圆点。第一次打开这个功能时，菜单会替你展开一次，之后听你自己的。
+- **搜索增强选项。** 在搜索框右边 ⚙ 打开的菜单里，原有的三个开关下面多出一组「搜索增强」：异体字等同、跨页码与折行、跨标注与注释、忽略标点、只搜标题。有选项在起作用时，⚙ 按钮上会亮一个小圆点。第一次打开这个功能时，菜单会替你展开一次，之后听你自己的。
 - **标题树。** 每条结果前补上它所在的标题行，按层级缩进，点标题行可折叠或展开它下面的结果。
 
 它是怎么起作用的：
@@ -110,6 +114,12 @@ No network access, no telemetry, no account; works on desktop and mobile. The in
 
 ![A phrase split by a page marker: 1 match before, 2 after](assets/guide/en-cross.png)
 
-![Results grouped by heading: flat before, a tree after](assets/guide/en-tree.png) MIT licence; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
+![Results grouped by heading: flat before, a tree after](assets/guide/en-tree.png)
 
-Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, marked as added by this plugin, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.
+**Find in note (Ctrl+F).** Obsidian's own Ctrl+F marks one match at a time; this plugin's panel lists every match under its headings. Top: Obsidian; bottom: this plugin.
+
+![Find in note: one match at a time before, all matches by heading after](assets/guide/find-en.png)
+
+Licence: MIT; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
+
+Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.

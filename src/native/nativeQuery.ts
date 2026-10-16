@@ -1,7 +1,7 @@
 /**
  * Obsidian 自带搜索面板的「搜索增强」（实验性，默认关闭）：
  * 在搜索框右边 ⚙ 打开的菜单里、原有的三个开关下面，加一组勾选框（异体字等同、跨页码与折行……），
- * 标明是本插件新增的；有选项在起作用时，⚙ 按钮上亮一个小圆点。
+ * 有选项在起作用时，⚙ 按钮上亮一个小圆点。
  * 并在自带搜索「开始搜索」时，把搜索框里的普通词按勾选翻译成正则再交给它的解析器。
  * 搜索框里显示的字、保存下来的搜索都不变，只有实际执行的那一刻不一样。
  *
@@ -143,7 +143,6 @@ export class NativeSearchQuery {
     const block = createDiv({ cls: "bsrv-sr-options" });
     const head = block.createDiv({ cls: "bsrv-sr-options-head" });
     head.createSpan({ text: t("ns.title") });
-    head.createSpan({ cls: "bsrv-sr-badge", text: t("ns.badge") });
     const body = block.createDiv({ cls: "bsrv-sr-options-body" });
     const options = this.host.options();
     for (const { key, label, title } of OPTION_LABELS) {
