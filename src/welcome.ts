@@ -1,7 +1,7 @@
 /**
  * 首次启用时弹出的功能介绍：这个插件给搜索加了什么。只在第一次弹，之后可以从命令面板和设置页再打开。
  */
-import { Modal, Notice, type App } from "obsidian";
+import { Modal, Notice, setIcon, type App } from "obsidian";
 import { currentLanguage, t, type MessageKey } from "./i18n";
 import { GUIDE_IMAGES, type GuideId } from "./guide/images";
 
@@ -18,6 +18,12 @@ export interface WelcomeOptions {
   onEnableNative(): Promise<void> | void;
 }
 
+interface Item {
+  icon: string;
+  title: MessageKey;
+  text: MessageKey;
+}
+
 export class WelcomeModal extends Modal {
   constructor(app: App, private readonly options: WelcomeOptions) {
     super(app);
@@ -28,16 +34,45 @@ export class WelcomeModal extends Modal {
     contentEl.empty();
     this.modalEl.addClass("bsrv-welcome");
     this.setTitle(t("welcome.title"));
-    contentEl.createEl("p", { cls: "bsrv-welcome-intro", text: t("welcome.intro") });
+    // 介绍和对比图在可滚动的区域里；提示和按钮放在它下面，滚到哪里都看得见、不被裁
+    const scroll = contentEl.createDiv({ cls: "bsrv-welcome-scroll" });
+    scroll.createEl("p", { cls: "bsrv-welcome-intro", text: t("welcome.intro") });
 
-    // 第一部分：文内查找。图是上下排开的（上面自带、下面本插件）
-    this.addSection("welcome.sectionFind", "welcome.sectionFindText", [{ id: "find", title: "welcome.cmpFindTitle", text: "welcome.cmpFindText" }]);
-    // 第二部分：自带侧栏搜索。图是左右排开的（左边自带、右边开启搜索增强之后）
-    this.addSection("welcome.sectionSide", "welcome.sectionSideText", [
+    const items: Item[] = [
+      { icon: "search", title: "welcome.findTitle", text: "welcome.findText" },
+      { icon: "list-tree", title: "welcome.nativeTitle", text: "welcome.nativeText" },
+      { icon: "scissors", title: "welcome.crossTitle", text: "welcome.crossText" }
+    ];
+    if (this.options.variants) items.push({ icon: "languages", title: "welcome.variantsTitle", text: "welcome.variantsText" });
+
+    const list = scroll.createDiv({ cls: "bsrv-welcome-list" });
+    for (const item of items) {
+      const row = list.createDiv({ cls: "bsrv-welcome-item" });
+      setIcon(row.createDiv({ cls: "bsrv-welcome-icon" }), item.icon);
+      const body = row.createDiv({ cls: "bsrv-welcome-body" });
+      body.createDiv({ cls: "bsrv-welcome-title", text: t(item.title) });
+      body.createDiv({ cls: "bsrv-welcome-text", text: t(item.text) });
+    }
+
+    // 效果对比：真实截图，左边自带搜索，右边打开搜索增强之后
+    const compare = scroll.createDiv({ cls: "bsrv-welcome-compare" });
+    compare.createDiv({ cls: "bsrv-welcome-compare-title", text: t("welcome.compareTitle") });
+    compare.createEl("p", { cls: "bsrv-welcome-text", text: t("welcome.compareNote") });
+    const images = GUIDE_IMAGES[currentLanguage()];
+    const pairs: Array<{ id: GuideId; title: MessageKey; text: MessageKey }> = [
+      { id: "find", title: "welcome.cmpFindTitle", text: "welcome.cmpFindText" },
       { id: "tree", title: "welcome.cmpTreeTitle", text: "welcome.cmpTreeText" },
       { id: "cross", title: "welcome.cmpCrossTitle", text: "welcome.cmpCrossText" },
       { id: "variants", title: "welcome.cmpVariantsTitle", text: "welcome.cmpVariantsText" }
-    ]);
+    ];
+    for (const pair of pairs) {
+      const src = images[pair.id];
+      if (!src || (pair.id === "variants" && !this.options.variants)) continue;
+      const figure = compare.createDiv({ cls: "bsrv-welcome-figure" });
+      figure.createDiv({ cls: "bsrv-welcome-title", text: t(pair.title) });
+      figure.createDiv({ cls: "bsrv-welcome-text", text: t(pair.text) });
+      figure.createEl("img", { cls: "bsrv-welcome-shot", attr: { src, alt: t(pair.title) } });
+    }
 
     contentEl.createEl("p", { cls: "bsrv-welcome-later", text: t("welcome.later") });
     const footer = contentEl.createDiv({ cls: "bsrv-welcome-footer" });
@@ -50,21 +85,6 @@ export class WelcomeModal extends Modal {
     }
     const close = footer.createEl("button", { cls: "mod-cta", text: t("welcome.close") });
     close.addEventListener("click", () => this.close());
-  }
-
-  private addSection(title: MessageKey, text: MessageKey, figures: Array<{ id: GuideId; title: MessageKey; text: MessageKey }>): void {
-    const section = this.contentEl.createDiv({ cls: "bsrv-welcome-compare" });
-    section.createDiv({ cls: "bsrv-welcome-compare-title", text: t(title) });
-    section.createEl("p", { cls: "bsrv-welcome-text", text: t(text) });
-    const images = GUIDE_IMAGES[currentLanguage()];
-    for (const figureInfo of figures) {
-      const src = images[figureInfo.id];
-      if (!src || (figureInfo.id === "variants" && !this.options.variants)) continue;
-      const figure = section.createDiv({ cls: "bsrv-welcome-figure" });
-      figure.createDiv({ cls: "bsrv-welcome-title", text: t(figureInfo.title) });
-      figure.createDiv({ cls: "bsrv-welcome-text", text: t(figureInfo.text) });
-      figure.createEl("img", { cls: "bsrv-welcome-shot", attr: { src, alt: t(figureInfo.title) } });
-    }
   }
 
   onClose(): void {
