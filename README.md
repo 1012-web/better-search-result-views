@@ -2,12 +2,12 @@
 
 本插件优化了 Obsidian 的搜索结果展示方式：
 
-- **结果按标题归类。** 命中归在各自的标题层级下面（文件 → 一级标题 → 二级标题 → 命中所在的段落），命中字高亮，标题可折叠；同一段里的几处命中合成一张卡片。
-- **文内查找。** 当前笔记里按 `Ctrl+F`（可选接管），弹出面板列出全部命中，点哪条跳哪条；不用再靠上下箭头逐处翻。
-- **自带搜索一起升级。** Obsidian 自带的侧栏搜索，结果也显示成标题树；⚙ 菜单里多一组勾选项（异体字、跨页码与折行、只搜标题等）。默认开启，可在设置里关。搜索范围仍用自带的 `path:` 写法。
-- **切开的词也找得到。** 词被换行、HTML 标签、`%%备注%%`、脚注号或页码标记切开，照样命中。
-- **文内查找有两种显示，面板上可切换。** 树形（见上）和紧凑（一处一行），默认紧凑。
-- **读中文古籍、史料转写的人另有两样。** 异体字当同一个字找（「鄴／邺」「於／于」「後／后」互通，对照表只用于检索，不改你的笔记）；笔记里用 `<!--p.12-->` 标出原书页码的话，结果会带页码（格式见下面的「页码标记」）。其他用途可以不管它们。
+- **文内查找。** 在笔记里按 `Ctrl+F`（可选接管），浮出一个面板，列出全部命中，点哪条跳哪条；命中归在各自的标题层级下面，可折叠，面板上可在树形和紧凑（一处一行）之间切换。
+- **自带搜索的结果更好看。** Obsidian 自带的搜索，结果显示成标题树；⚙ 菜单里多一组「搜索增强」选项（可在设置里关）。搜索范围仍用自带的 `path:` 写法。
+- **切开的词也找得到。** 词被换行、`<!--p.12-->` 页码标记、标签或注释切开，照样命中。
+- **异体字等同。** 「鄴／邺」「於／于」这类异体字当同一个字找，只用于检索，不改你的笔记。
+
+异体字和页码标记主要给读中文古籍、史料转写的人用，其他人可以不管。笔记里用 `<!--p.12-->` 标出原书页码的话，文内查找的结果会带页码（格式见下面的「页码标记」）。
 
 本插件独立开发，与 [Better Search Views](https://github.com/ivan-lednev/better-search-views) 没有隶属关系，参考关系见文末「致谢」。
 
@@ -97,12 +97,12 @@ npm run unihan -- <Unihan.zip>   # 重新生成 Unihan 对照表
 
 This plugin improves how Obsidian shows search results:
 
-- **Results grouped by heading.** Each match sits under its heading levels (file, then H1, H2, and so on, then the paragraph holding the match) with the match highlighted. Headings fold, and several matches in one paragraph share a card.
-- **Find in note.** Press `Ctrl+F` (taking it over is optional) to get a panel that lists every match in the note; click one to jump to it instead of stepping with the arrows.
-- **The built-in search gets better too.** Obsidian's own sidebar Search shows its results as a heading tree, with a group of checkbox options in its ⚙ menu (variants, across page markers and line breaks, headings only, and more). On by default; switch it off in settings. Limit the scope with the built-in `path:` operator.
-- **Search across breaks.** Words split by a line break, an inline HTML tag, a `%%comment%%`, a footnote mark or a page marker are still found.
-- **Find in note has two views, switchable on the panel.** Tree (above) and compact (one line per match); compact is the default.
-- **Two extras if you read Chinese historical texts.** Variant characters count as the same (`鄴` and `邺`, `於` and `于`, `後` and `后`; the table is used for searching only and your notes are never rewritten), and page markers such as `<!--p.12-->` show up as page numbers in the results. You can ignore both otherwise.
+- **Find in note.** Press `Ctrl+F` (taking it over is optional) for a floating panel that lists every match; click one to jump to it. Matches sit under their headings, which fold, and the panel switches between tree and compact (one line per match).
+- **Better results in Obsidian's own search.** Its results show as a heading tree, and its ⚙ menu gets a group of "Search enhancement" options (switch it off in settings). Limit the scope with the built-in `path:` operator.
+- **Finds words that are split.** Words broken by a line break, a `<!--p.12-->` page marker, a tag or a comment are still found.
+- **Variant characters.** Variants such as `鄴` and `邺` count as the same character. Used for searching only; your notes are never changed.
+
+Variants and page markers are mainly for people who read Chinese historical texts; you can ignore them otherwise. If your notes mark pages like `<!--p.12-->`, the find-in-note panel shows each result's page number.
 
 An independent plugin, not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
 

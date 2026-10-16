@@ -577,13 +577,22 @@ export class FindPanel {
     else this.root.style.removeProperty("--bsrv-find-height");
   }
 
+  /** 手机上视图的标题栏浮在正文上面：面板要摆在它下面，免得搜索框被盖住。电脑上标题栏在正文区之外，返回 0 */
+  private headerOverlap(host: HTMLElement): number {
+    const header = this.view.containerEl.querySelector<HTMLElement>(".view-header");
+    if (!header) return 0;
+    const bar = header.getBoundingClientRect();
+    const area = host.getBoundingClientRect();
+    return bar.height && bar.bottom > area.top && bar.top < area.bottom ? Math.ceil(bar.bottom - area.top) + 8 : 0;
+  }
+
   /** 摆到指定位置（夹在正文区之内），返回实际摆到的位置 */
   private place(position: PanelPosition): PanelPosition {
     const host = this.view.contentEl;
     // 这一页被别的标签页盖着时量不出大小：先不动
     if (!host.clientWidth || !host.clientHeight) return position;
     const right = Math.min(Math.max(0, host.clientWidth - this.root.offsetWidth), Math.max(0, position.right));
-    const top = Math.min(Math.max(0, host.clientHeight - HEAD_HEIGHT), Math.max(0, position.top));
+    const top = Math.min(Math.max(0, host.clientHeight - HEAD_HEIGHT), Math.max(this.headerOverlap(host), position.top));
     this.root.style.right = `${right}px`;
     this.root.style.top = `${top}px`;
     // 面板的最大高度要扣掉它上面那一截，见 styles/find.css
