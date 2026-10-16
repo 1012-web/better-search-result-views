@@ -3,16 +3,16 @@
  * 文内查找（find）那一组不同：左边是自带的 Ctrl+F，右边是本插件的文内查找面板，上下排开。
  * 图是中文、英文各一套（样例笔记的语言不同）；异体字那一组只有中文有。
  * 图用 data URI 打进 main.js，因为社区插件只发布 main.js、manifest.json、styles.css 三个文件。
- * 原图和说明见仓库的 assets/guide/。
+ * README 用同名 PNG；这里嵌入的是体积更小的 WebP（画质 60），由同一批截图生成。
  */
 import type { Language } from "../i18n";
-import enCross from "../../assets/guide/en-cross.png";
-import enFind from "../../assets/guide/find-en.png";
-import enTree from "../../assets/guide/en-tree.png";
-import zhCross from "../../assets/guide/zh-cross.png";
-import zhFind from "../../assets/guide/find-zh.png";
-import zhTree from "../../assets/guide/zh-tree.png";
-import zhVariants from "../../assets/guide/zh-variants.png";
+import enCross from "../../assets/guide/en-cross.webp";
+import enFind from "../../assets/guide/find-en.webp";
+import enTree from "../../assets/guide/en-tree.webp";
+import zhCross from "../../assets/guide/zh-cross.webp";
+import zhFind from "../../assets/guide/find-zh.webp";
+import zhTree from "../../assets/guide/zh-tree.webp";
+import zhVariants from "../../assets/guide/zh-variants.webp";
 
 export type GuideId = "cross" | "variants" | "tree" | "find";
 

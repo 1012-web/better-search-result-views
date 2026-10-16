@@ -25,7 +25,7 @@ const context = await esbuild.context({
   bundle: true,
   external: ["obsidian", "electron", "@codemirror/state", "@codemirror/view", "@codemirror/language", "@lezer/common"],
   format: "cjs",
-  loader: { ".png": "dataurl" },
+  loader: { ".webp": "dataurl" },
   target: "es2022",
   logLevel: "info",
   sourcemap: production ? false : "inline",
