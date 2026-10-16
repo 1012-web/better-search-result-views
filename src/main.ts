@@ -77,7 +77,7 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
       try {
         await module.onExternalDataChange?.(this.data.sections[key] ?? null);
       } catch (error) {
-        console.error(`[bsrv] 应用外部设置出错（${key}）`, error);
+        console.error(`[bsrv] Failed to apply external settings (${key})`, error);
       }
     }
   }
@@ -86,7 +86,7 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
   private enqueue<T>(task: () => Promise<T>): Promise<T> {
     const run = this.saveChain.then(task);
     this.saveChain = run.then(() => undefined, (error: unknown) => {
-      console.error("[bsrv] 读写设置失败", error);
+      console.error("[bsrv] Failed to read or write settings", error);
     });
     return run;
   }

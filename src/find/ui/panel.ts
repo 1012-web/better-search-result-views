@@ -16,6 +16,7 @@ import type FindModule from "../main";
 import { PreviewMarker, previewScroller } from "../preview";
 import { landingY, lineContext, nearestIndex, rowParts, startIndex, statusText, stepIndex, type Band } from "../rows";
 import { MIN_PANEL_HEIGHT, MIN_PANEL_WIDTH, searchOptions } from "../settings";
+import { t } from "../../i18n";
 
 /** 打字后隔多久搜 */
 const INPUT_DELAY = 150;
@@ -44,6 +45,18 @@ export interface PanelPosition {
   /** 距正文区右边、上边的像素 */
   right: number;
   top: number;
+}
+
+interface PopoutWindow extends Window {
+  createDiv: typeof createDiv;
+  createSpan: typeof createSpan;
+  createEl: typeof createEl;
+  createFragment: typeof createFragment;
+}
+
+/** 这篇正文所在的窗口（主窗口或弹出窗口）：Obsidian 在每个窗口上都挂了 createDiv 等建元素的函数 */
+function windowOf(doc: Document): PopoutWindow {
+  return doc.win as PopoutWindow;
 }
 
 function editorView(view: MarkdownView): EditorView | null {
@@ -86,41 +99,41 @@ export class FindPanel {
     this.root = view.contentEl.createDiv({ cls: "bsrv-find" });
 
     const head = this.root.createDiv({ cls: "bsrv-find-head" });
-    head.createSpan({ cls: "bsrv-find-title", text: "查找" });
+    head.createSpan({ cls: "bsrv-find-title", text: t("find.title") });
     this.statusEl = head.createSpan({ cls: "bsrv-find-status" });
-    const close = head.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "关闭（Esc）" } });
+    const close = head.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": t("find.close") } });
     setIcon(close, "x");
     close.addEventListener("click", () => this.module.closePanel(this.view));
     this.enableDrag(head);
 
     const bar = this.root.createDiv({ cls: "bsrv-find-bar" });
     const box = bar.createDiv({ cls: "bsrv-find-box" });
-    this.inputEl = box.createEl("input", { type: "text", cls: "bsrv-find-input", attr: { placeholder: "在本篇里找", spellcheck: "false" } });
-    const clear = box.createEl("button", { cls: "bsrv-find-icon bsrv-find-clear clickable-icon", attr: { "aria-label": "清空" } });
+    this.inputEl = box.createEl("input", { type: "text", cls: "bsrv-find-input", attr: { placeholder: t("find.placeholder"), spellcheck: "false" } });
+    const clear = box.createEl("button", { cls: "bsrv-find-icon bsrv-find-clear clickable-icon", attr: { "aria-label": t("find.clear") } });
     setIcon(clear, "x-circle");
     clear.addEventListener("click", () => {
       this.inputEl.value = "";
       void this.run();
       this.inputEl.focus();
     });
-    const prev = bar.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "上一处（Shift+Enter）" } });
+    const prev = bar.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": t("find.prev") } });
     setIcon(prev, "arrow-left");
     prev.addEventListener("click", () => void this.step(-1));
-    const next = bar.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "下一处（Enter）" } });
+    const next = bar.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": t("find.next") } });
     setIcon(next, "arrow-right");
     next.addEventListener("click", () => void this.step(1));
 
     const tools = this.root.createDiv({ cls: "bsrv-find-tools" });
-    this.variantsButton = tools.createEl("button", { cls: "bsrv-find-toggle", text: "异体" });
+    this.variantsButton = tools.createEl("button", { cls: "bsrv-find-toggle", text: t("find.variants") });
     this.variantsButton.addEventListener("click", () => void this.module.updateSettings({ variants: !this.module.settings.variants }));
     this.punctButton = tools.createEl("button", {
       cls: "bsrv-find-toggle",
-      text: "忽略标点",
-      attr: { "aria-label": "标点不参与比对：「乙酉春」也能找到「乙酉，春」" }
+      text: t("find.ignorePunct"),
+      attr: { "aria-label": t("find.ignorePunctTip") }
     });
     this.punctButton.addEventListener("click", () => void this.module.updateSettings({ ignorePunct: !this.module.settings.ignorePunct }));
     tools.createDiv({ cls: "bsrv-find-spacer" });
-    this.listButton = tools.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "显示查找结果列表" } });
+    this.listButton = tools.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": t("find.showList") } });
     setIcon(this.listButton, "list");
     this.listButton.addEventListener("click", () => void this.module.updateSettings({ showList: !this.module.settings.showList }));
     this.viewButton = tools.createEl("button", { cls: "bsrv-find-icon clickable-icon" });
@@ -128,7 +141,7 @@ export class FindPanel {
     this.viewButton.addEventListener("click", () => void this.module.updateSettings({ listView: this.module.settings.listView === "tree" ? "compact" : "tree" }));
 
     this.listEl = this.root.createDiv({ cls: "bsrv-find-list" });
-    this.enableResize(this.root.createDiv({ cls: "bsrv-find-resize", attr: { "aria-label": "按住拖动：拉宽、拉高" } }));
+    this.enableResize(this.root.createDiv({ cls: "bsrv-find-resize", attr: { "aria-label": t("find.resize") } }));
     this.listEl.addEventListener("click", (event) => {
       const target = event.target as HTMLElement | null;
       const row = target?.closest<HTMLElement>(".bsrv-find-row, .bsrv-find-card");
@@ -153,7 +166,7 @@ export class FindPanel {
     });
     this.inputEl.addEventListener("keydown", (event) => {
       // 输入法里的 Enter 是「上屏」，不是「下一处」
-      if (event.isComposing || this.composing || event.keyCode === 229) return;
+      if (event.isComposing || this.composing || event.key === "Process") return;
       const delta = event.key === "Enter" ? (event.shiftKey ? -1 : 1) : event.key === "ArrowDown" ? 1 : event.key === "ArrowUp" ? -1 : 0;
       if (!delta) return;
       event.preventDefault();
@@ -228,11 +241,11 @@ export class FindPanel {
       button.setAttribute("aria-pressed", String(on));
     };
     toggle(this.variantsButton, settings.variants);
-    this.variantsButton.setAttribute("aria-label", "异体字等同：按对照表把异体当同一个字（邺＝鄴）");
+    this.variantsButton.setAttribute("aria-label", t("find.variantsTip"));
     toggle(this.punctButton, settings.ignorePunct);
     toggle(this.listButton, settings.showList);
     toggle(this.viewButton, settings.listView === "tree");
-    this.viewButton.setAttribute("aria-label", settings.listView === "tree" ? "现在是树形显示，点一下换成紧凑列表" : "现在是紧凑列表，点一下换成树形显示（按标题归类，带所在段落）");
+    this.viewButton.setAttribute("aria-label", t(settings.listView === "tree" ? "view.isTree" : "view.isCompact"));
     this.root.toggleClass("is-list-hidden", !settings.showList);
   }
 
@@ -307,22 +320,22 @@ export class FindPanel {
     const to = Math.min(this.hits.length, until);
     if (to <= this.rendered) return;
     const doc = this.listEl.doc;
-    const fragment = doc.createDocumentFragment();
+    const fragment = windowOf(doc).createFragment();
     for (let index = this.rendered; index < to; index++) {
       const hit = this.hits[index];
       const parts = rowParts({ ...lineContext(this.text, hit.from, hit.to), match: hit.match });
-      const row = doc.createElement("div");
+      const row = windowOf(doc).createDiv();
       row.className = "bsrv-find-row";
       row.dataset.index = String(index);
       if (hit.entry) row.title = hit.entry;
-      const line = doc.createElement("span");
+      const line = windowOf(doc).createSpan();
       line.className = "bsrv-find-text";
-      const mark = doc.createElement("mark");
+      const mark = windowOf(doc).createEl("mark");
       mark.textContent = parts.match;
       line.append(parts.before, mark, parts.after);
       row.append(line);
       if (hit.page !== null) {
-        const page = doc.createElement("span");
+        const page = windowOf(doc).createSpan();
         page.className = "bsrv-find-page";
         page.textContent = `p.${hit.page}`;
         row.append(page);
@@ -338,7 +351,7 @@ export class FindPanel {
     const doc = this.listEl.doc;
     const indexed: IndexedHit[] = this.hits.map((hit, index) => ({ trail: hit.trail, hit, index }));
     const tree = buildTrailTree(indexed);
-    const fragment = doc.createDocumentFragment();
+    const fragment = windowOf(doc).createFragment();
     for (const group of groupByBlock(tree.rootHits)) fragment.append(this.treeCard(doc, group));
     for (const node of tree.children) fragment.append(this.treeNode(doc, node));
     this.listEl.append(fragment);
@@ -346,19 +359,19 @@ export class FindPanel {
   }
 
   private treeNode(doc: Document, node: TreeNode<IndexedHit>): HTMLElement {
-    const wrap = doc.createElement("div");
+    const wrap = windowOf(doc).createDiv();
     wrap.className = "bsrv-find-node";
-    const head = doc.createElement("div");
+    const head = windowOf(doc).createDiv();
     head.className = "bsrv-find-node-head";
-    const title = doc.createElement("span");
+    const title = windowOf(doc).createSpan();
     title.className = "bsrv-find-node-title";
-    title.textContent = node.title || "（无标题）";
-    const count = doc.createElement("span");
+    title.textContent = node.title || t("common.noHeading");
+    const count = windowOf(doc).createSpan();
     count.className = "bsrv-find-node-count";
     count.textContent = String(node.count);
     head.append(title, count);
     head.addEventListener("click", () => wrap.classList.toggle("is-collapsed"));
-    const body = doc.createElement("div");
+    const body = windowOf(doc).createDiv();
     body.className = "bsrv-find-node-body";
     for (const group of groupByBlock(node.hits)) body.append(this.treeCard(doc, group));
     for (const child of node.children) body.append(this.treeNode(doc, child));
@@ -369,15 +382,15 @@ export class FindPanel {
   /** 同一段里相隔不远的几处命中并成一张卡片，每处都高亮 */
   private treeCard(doc: Document, group: IndexedHit[]): HTMLElement {
     const first = group[0];
-    const card = doc.createElement("div");
+    const card = windowOf(doc).createDiv();
     card.className = "bsrv-find-card";
     card.dataset.index = String(first.index);
-    const line = doc.createElement("span");
+    const line = windowOf(doc).createSpan();
     line.className = "bsrv-find-text";
     line.append(first.hit.blockBefore);
     group.forEach(({ hit, index }, position) => {
       if (position > 0) line.append(hit.joinGap ?? "");
-      const mark = doc.createElement("mark");
+      const mark = windowOf(doc).createEl("mark");
       mark.dataset.hit = String(index);
       mark.textContent = hit.match;
       line.append(mark);
@@ -385,7 +398,7 @@ export class FindPanel {
     line.append(group[group.length - 1].hit.blockAfter);
     card.append(line);
     if (first.hit.page !== null) {
-      const page = doc.createElement("span");
+      const page = windowOf(doc).createSpan();
       page.className = "bsrv-find-page";
       page.textContent = `p.${first.hit.page}`;
       card.append(page);
@@ -426,7 +439,7 @@ export class FindPanel {
     try {
       editorView(this.view)?.dispatch({ effects: setFindMarks.of(source && this.hits.length ? { ranges: this.hits, current: this.current } : null) });
     } catch (error) {
-      console.error("[bsrv] 编辑模式标出命中时出错", error);
+      console.error("[bsrv] Failed to mark matches in the editor", error);
     }
     // 实时预览里被换成 HTML 小部件的标注：装饰标不进去，由 marker 按渲染出来的文字补标
     this.marker.set(this.searched ? { ...this.searched, hits: this.hits, current: this.current } : null, source ? "widgets" : "preview");

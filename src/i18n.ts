@@ -1,0 +1,272 @@
+/**
+ * 界面文字：英文、简体中文两套。跟随 Obsidian 的界面语言（中文、繁体中文用中文，其余用英文）。
+ * 控制台日志不翻译，只写英文。
+ */
+import { getLanguage } from "obsidian";
+
+export type Language = "en" | "zh";
+
+const en = {
+  // 公共
+  "common.noHeading": "(No heading)",
+  "n.match1": "1 match",
+  "n.matchN": "{n} matches",
+  "n.firstMatches": "First {n} matches",
+  "n.file1": "1 file",
+  "n.fileN": "{n} files",
+  "view.isTree": "Showing a tree. Click for the compact list.",
+  "view.isCompact": "Showing the compact list. Click for the tree.",
+  "status.none": "No matches",
+  "notice.noMatches": "No matches",
+
+  // 命令
+  "cmd.search": "Variant search (across pages)",
+  "cmd.searchSelection": "Variant search for selected text",
+  "cmd.coreSearch": "Search selected text with variants in Obsidian search",
+  "cmd.findOpen": "Find in note (with result list)",
+  "cmd.findCore": "Obsidian built-in find in note",
+
+  // 文内查找面板
+  "find.title": "Find",
+  "find.close": "Close (Esc)",
+  "find.placeholder": "Find in this note",
+  "find.clear": "Clear",
+  "find.prev": "Previous match (Shift+Enter)",
+  "find.next": "Next match (Enter)",
+  "find.variants": "Variants",
+  "find.variantsTip": "Treat variant characters as the same, for example 邺 and 鄴",
+  "find.ignorePunct": "Ignore punctuation",
+  "find.ignorePunctTip": "Punctuation is ignored when matching, so 乙酉春 also finds 乙酉，春",
+  "find.showList": "Show the result list",
+  "find.resize": "Drag to resize",
+
+  // 侧栏
+  "vs.title": "Variant search",
+  "vs.placeholder": "Text to find",
+  "vs.optVariants": "Variants",
+  "vs.optVariantsTip": "Treat variant characters as the same, for example 邺 and 鄴. The sources of the table are chosen in settings",
+  "vs.optCross": "Across page markers and line breaks",
+  "vs.optCrossTip": "Words split by a <!--p.N--> page marker or a line break are still found",
+  "vs.optMarkup": "Across markup and comments",
+  "vs.optMarkupTip": "Words with highlight tags, %%comments%% or footnote marks in the middle are still found",
+  "vs.optPunct": "Ignore punctuation",
+  "vs.optPunctTip": "Punctuation is ignored when matching, so 乙酉春 also finds 乙酉，春",
+  "vs.optTitles": "Headings only",
+  "vs.optTitlesTip": "Only look in heading lines",
+  "scope.file": "Current file",
+  "scope.folder": "Current folder",
+  "scope.vault": "Whole vault",
+  "scope.folderLabel": "Folder {name}",
+  "scope.root": "Vault root",
+  "vs.openCore": "Open in Obsidian search",
+  "vs.openCoreTip": "Rewrite the query as a regular expression that covers variants and open it in Obsidian's built-in search (which cannot match across page markers or markup)",
+  "vs.searching": "Searching…",
+  "vs.summary": "{scope}: {matches} in {files}",
+  "vs.capped": " (only the first {n} are listed; change the limit in settings)",
+  "vs.notFound": "{scope}: no matches",
+  "vs.error": "Search failed: {message}",
+  "vs.flag": "Other reading",
+  "vs.flagTip": "Matched through another reading of an uncertain character",
+  "vs.flagTipCard": "A match in this card used another reading of an uncertain character",
+  "vs.copyCite": "Copy citation",
+
+  // 命令与提示
+  "note.tableEmpty": "The variant table is empty: turn on a Unihan table or add custom groups in settings",
+  "notice.cannotOpen": "Cannot open: {path}",
+  "notice.copied": "Copied: {text}",
+  "notice.needQuery": "Type or select the text to search for first",
+  "notice.noCoreSearch": "Obsidian's built-in Search core plugin is turned off",
+  "cite.title": "{title}",
+  "cite.entry": ", \"{entry}\"",
+  "cite.page": ", p.{page}",
+
+  // 对照表来源
+  "src.custom": "Custom variant groups",
+  "src.tradSimp": "Unihan traditional and simplified",
+  "src.z": "Unihan z-variants",
+  "src.semantic": "Unihan semantic variants",
+
+  // 异体字检索设置
+  "vset.heading": "Variant search",
+  "vset.intro": "When Variants is ticked in the search panel, the variants from the sources below are treated as the same character. The table is only used for searching; your notes are never changed.",
+  "vset.customName": "Custom variant groups",
+  "vset.customDesc": "One group per line. Characters in a group are variants of each other, for example 於于 or 鄴邺. No separators are needed.",
+  "vset.unihanHeading": "General tables (Unicode Unihan)",
+  "vset.tsName": "Traditional and simplified",
+  "vset.tsDesc": "About 6,900 pairs such as 鄴/邺, 疊/叠, 於/于 and 後/后. When on, 后 also finds 後.",
+  "vset.zName": "Z-variants",
+  "vset.zDesc": "About 90 pairs: forms with identical meaning that are only written differently.",
+  "vset.semName": "Semantic variants",
+  "vset.semDesc": "About 2,200 pairs: related in meaning but not the same character. Broad, so searching one character brings up many unrelated results.",
+  "vset.resultHeading": "Results",
+  "vset.maxName": "Maximum matches listed",
+  "vset.maxDesc": "20 to 5,000. Searching a common character across the vault gives many results, and a long list makes the panel slow.",
+  "vset.current": "Current table",
+  "vset.counting": "Counting…",
+  "vset.noSources": "No sources: ticking Variants will not fold anything.",
+  "vset.sourceGroups": "{label}: {n} groups",
+  "vset.sourceError": "{label}: {error}",
+  "vset.total": "{n} characters registered in total",
+
+  // 文内查找设置
+  "fset.heading": "Find in note",
+  "fset.intro": "A find panel floats over the note: type to search this note, see every match listed below, and click one to jump to it. The toggles for variants, punctuation and the result list are on the panel and remember your last choice.",
+  "fset.takeoverName": "Take over Ctrl+F",
+  "fset.takeoverDesc": "Pressing Ctrl+F in a note (Obsidian's built-in find in current file) opens this panel. When off, Ctrl+F goes back to the built-in find bar, and this panel opens from the command Find in note (with result list). The built-in find bar, including replace, is always available from the command Obsidian built-in find in note.",
+  "fset.crossName": "Across page markers and line breaks",
+  "fset.crossDesc": "Words split by a <!--p.N--> page marker or a line break are still found.",
+  "fset.markupName": "Across markup and comments",
+  "fset.markupDesc": "Words with highlight tags, %%comments%% or footnote marks in the middle are still found.",
+  "fset.maxName": "Maximum matches listed",
+  "fset.maxDesc": "{min} to {max}. A common character can have over a thousand matches in one note, and a long list makes the panel slow.",
+  "fset.layoutName": "Panel position and size",
+  "fset.layoutDesc": "Drag the title bar to move the panel and drag the bottom-left corner to resize it. Where you leave it is remembered after a restart. This resets it to the default top-right position and size.",
+  "fset.reset": "Reset to default"
+} as const;
+
+export type MessageKey = keyof typeof en;
+
+const zh: Record<MessageKey, string> = {
+  "common.noHeading": "（无标题）",
+  "n.match1": "1 处",
+  "n.matchN": "{n} 处",
+  "n.firstMatches": "前 {n} 处",
+  "n.file1": "1 个文件",
+  "n.fileN": "{n} 个文件",
+  "view.isTree": "现在是树形显示，点一下换成紧凑列表",
+  "view.isCompact": "现在是紧凑列表，点一下换成树形显示",
+  "status.none": "没有找到",
+  "notice.noMatches": "没有找到",
+
+  "cmd.search": "查找（异体字、跨页）",
+  "cmd.searchSelection": "用选中的文字查找（异体字、跨页）",
+  "cmd.coreSearch": "用选中的文字做异体扩展搜索（Obsidian 自带搜索）",
+  "cmd.findOpen": "文内查找（带结果列表）",
+  "cmd.findCore": "Obsidian 自带的文内查找",
+
+  "find.title": "查找",
+  "find.close": "关闭（Esc）",
+  "find.placeholder": "在本篇里找",
+  "find.clear": "清空",
+  "find.prev": "上一处（Shift+Enter）",
+  "find.next": "下一处（Enter）",
+  "find.variants": "异体",
+  "find.variantsTip": "异体字等同：按对照表把异体当同一个字（邺＝鄴）",
+  "find.ignorePunct": "忽略标点",
+  "find.ignorePunctTip": "标点不参与比对：「乙酉春」也能找到「乙酉，春」",
+  "find.showList": "显示查找结果列表",
+  "find.resize": "按住拖动：拉宽、拉高",
+
+  "vs.title": "查找（异体字）",
+  "vs.placeholder": "输入要找的字词",
+  "vs.optVariants": "异体字等同",
+  "vs.optVariantsTip": "按对照表把异体当同一个字（邺＝鄴）；对照表来源在设置里选",
+  "vs.optCross": "跨页码与折行",
+  "vs.optCrossTip": "词被 <!--p.N--> 页码锚点或换行切开时照样能搜到",
+  "vs.optMarkup": "跨标注与注释",
+  "vs.optMarkupTip": "词中间夹着高亮标签、%%备注%%、脚注号时照样能搜到",
+  "vs.optPunct": "忽略标点",
+  "vs.optPunctTip": "标点不参与比对：「乙酉春」也能搜到「乙酉，春」",
+  "vs.optTitles": "只搜标题",
+  "vs.optTitlesTip": "只在 # 标题行里找",
+  "scope.file": "当前文件",
+  "scope.folder": "当前文件夹",
+  "scope.vault": "全库",
+  "scope.folderLabel": "文件夹 {name}",
+  "scope.root": "库根目录",
+  "vs.openCore": "在 Obsidian 搜索中打开",
+  "vs.openCoreTip": "把查询改写成带异体的正则，送进 Obsidian 自带搜索（自带搜索跨不过页码锚点与标注）",
+  "vs.searching": "查找中……",
+  "vs.summary": "{scope}：{matches}，{files}",
+  "vs.capped": "（只列前 {n} 处，可在设置里调）",
+  "vs.notFound": "{scope}：没有找到",
+  "vs.error": "查找出错：{message}",
+  "vs.flag": "另读",
+  "vs.flagTip": "这处是按存疑字的另一种读法命中的",
+  "vs.flagTipCard": "这张卡片里有按存疑字的另一种读法命中的",
+  "vs.copyCite": "复制出处",
+
+  "note.tableEmpty": "对照表是空的：到设置里打开 Unihan 表或加自定义异体组",
+  "notice.cannotOpen": "打不开：{path}",
+  "notice.copied": "已复制：{text}",
+  "notice.needQuery": "先输入或选中要找的字词",
+  "notice.noCoreSearch": "Obsidian 自带的「搜索」核心插件没有开启",
+  "cite.title": "《{title}》",
+  "cite.entry": "「{entry}」条",
+  "cite.page": "p.{page}",
+
+  "src.custom": "自定义异体组",
+  "src.tradSimp": "Unihan 繁简对应",
+  "src.z": "Unihan 同字异写",
+  "src.semantic": "Unihan 语义异体",
+
+  "vset.heading": "异体字检索",
+  "vset.intro": "查找面板里勾选「异体字等同」时，下面各来源的异体当同一个字找。对照表只用于检索，不改正文。",
+  "vset.customName": "自定义异体组",
+  "vset.customDesc": "一行一组，同组的字互为异体，如「於于」「鄴邺」。字与字之间可以不加分隔。",
+  "vset.unihanHeading": "通用对照表（Unicode Unihan）",
+  "vset.tsName": "繁简对应",
+  "vset.tsDesc": "约 6900 对，如 鄴／邺、疊／叠、於／于、後／后。打开后繁简互通，「后」也会搜到「後」。",
+  "vset.zName": "同字异写",
+  "vset.zDesc": "约 90 对：字义全同、只是写法不同的字形。",
+  "vset.semName": "语义异体",
+  "vset.semDesc": "约 2200 对：意义相通但不完全同字，范围宽，搜一个字会冒出不少不相干的结果。",
+  "vset.resultHeading": "结果",
+  "vset.maxName": "最多列出几处",
+  "vset.maxDesc": "20 到 5000。全库搜常用字时结果会很多，列得太多面板会慢。",
+  "vset.current": "当前对照表",
+  "vset.counting": "统计中……",
+  "vset.noSources": "没有任何来源：勾选「异体字等同」也不会折叠。",
+  "vset.sourceGroups": "{label}：{n} 组",
+  "vset.sourceError": "{label}：{error}",
+  "vset.total": "合计登记 {n} 个字",
+
+  "fset.heading": "文内查找",
+  "fset.intro": "在正文上浮一个查找面板：输入即搜当前这篇，下面列出全部命中，点哪条跳哪条。「异体」「忽略标点」和结果列表的开关在面板上，会记住上次的选择。",
+  "fset.takeoverName": "接管 Ctrl+F",
+  "fset.takeoverDesc": "在正文里按 Ctrl+F（Obsidian 自带的「搜索当前文件」）时打开本面板。关掉后 Ctrl+F 回到自带的查找条，本面板从命令「文内查找（带结果列表）」打开。自带的查找条（含替换）随时可以从命令「Obsidian 自带的文内查找」调出。",
+  "fset.crossName": "跨页码与折行",
+  "fset.crossDesc": "词被 <!--p.N--> 页码锚点或换行切开时照样能找到。",
+  "fset.markupName": "跨标注与注释",
+  "fset.markupDesc": "词中间夹着高亮标签、%%备注%%、脚注号时照样能找到。",
+  "fset.maxName": "最多列出几处",
+  "fset.maxDesc": "{min} 到 {max}。一篇里的常用字可能有上千处，列得太多面板会慢。",
+  "fset.layoutName": "面板的位置与大小",
+  "fset.layoutDesc": "按住面板的标题栏可以拖动，按住左下角可以拉宽、拉高；拖到哪、拉多大都会记住，重启后还在。这里可以恢复成默认的右上角与默认大小。",
+  "fset.reset": "恢复默认"
+};
+
+/** 两套文字，供测试核对占位符是否一致 */
+export const catalogs: Record<Language, Record<MessageKey, string>> = { en, zh };
+
+let override: Language | null = null;
+
+/** 测试或调试时固定语言；传 null 恢复为跟随 Obsidian */
+export function setLanguage(language: Language | null): void {
+  override = language;
+}
+
+export function currentLanguage(): Language {
+  if (override) return override;
+  try {
+    const code = getLanguage();
+    return code === "zh" || code === "zh-TW" ? "zh" : "en";
+  } catch {
+    return "en";
+  }
+}
+
+export function t(key: MessageKey, vars?: Record<string, string | number>): string {
+  const template: string = (currentLanguage() === "zh" ? zh : en)[key];
+  if (!vars) return template;
+  return template.replace(/\{(\w+)\}/g, (whole, name: string) => (name in vars ? String(vars[name]) : whole));
+}
+
+/** 「3 处」「1 match」：按数量选单复数 */
+export function matchesLabel(n: number): string {
+  return n === 1 ? t("n.match1") : t("n.matchN", { n });
+}
+
+export function filesLabel(n: number): string {
+  return n === 1 ? t("n.file1") : t("n.fileN", { n });
+}

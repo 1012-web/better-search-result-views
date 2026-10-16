@@ -305,7 +305,7 @@ export class PreviewMarker {
       }
     } catch (error) {
       // 内部结构变了、对不上：不标，查找与跳转照常
-      console.error("[bsrv] 阅读模式标出命中时出错", error);
+      console.error("[bsrv] Failed to mark matches in reading view", error);
     }
     this.currentRange = current;
     setMarks(win, this, { all, current });

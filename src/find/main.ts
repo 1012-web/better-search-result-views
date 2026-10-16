@@ -12,6 +12,7 @@ import { findMarksExtension } from "./highlight";
 import { normalizeFindSettings, type FindSettings } from "./settings";
 import { FindPanel, type PanelPosition } from "./ui/panel";
 import { renderFindSettings } from "./ui/settingsTab";
+import { t } from "../i18n";
 
 /** Obsidian 自带的「搜索当前文件」命令（内部接口，没有公开类型） */
 const CORE_SEARCH_COMMAND = "editor:open-search";
@@ -98,7 +99,7 @@ export default class FindModule extends PluginModule {
     try {
       return (await this.variants.table()).table;
     } catch (error) {
-      console.error("[bsrv] 文内查找读异体对照表出错", error);
+      console.error("[bsrv] Failed to read the variant table for find in note", error);
       return null;
     }
   }
@@ -111,7 +112,7 @@ export default class FindModule extends PluginModule {
   private registerCommands(): void {
     this.addCommand({
       id: "find-open",
-      name: "文内查找（带结果列表）",
+      name: t("cmd.findOpen"),
       checkCallback: (checking) => {
         const view = this.activeView();
         if (!view) return false;
@@ -122,7 +123,7 @@ export default class FindModule extends PluginModule {
     // 接管 Ctrl+F 之后，自带的查找条（含替换）从这条命令调出
     this.addCommand({
       id: "find-core",
-      name: "Obsidian 自带的文内查找",
+      name: t("cmd.findCore"),
       checkCallback: (checking) => {
         const view = this.activeView();
         if (!view || typeof view.showSearch !== "function") return false;

@@ -24,6 +24,9 @@ export class TFile {}
 export class Menu {}
 export const Platform = { isMobile: false };
 export function setIcon(): void {}
+export function getLanguage(): string {
+  return "zh";
+}
 export function normalizePath(p: string): string {
   return p;
 }

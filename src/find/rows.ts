@@ -3,6 +3,7 @@
  * 在命中之间怎么走、跳过去以后命中该落在屏幕的哪个高度。
  */
 import { cleanForDisplay } from "../variants/search";
+import { matchesLabel, t } from "../i18n";
 
 /** 一行里命中之前最多留几个字：再多，命中的词就被挤到面板右边看不见了 */
 export const BEFORE_CHARS = 12;
@@ -126,7 +127,7 @@ export function landingY(view: Band, panel: Band | null): number {
 /** 状态栏文字：「3 / 12 处」「12 处」「没有找到」；列满了注明只列了前几处 */
 export function statusText(count: number, current: number, capped: boolean, hasQuery: boolean): string {
   if (!hasQuery) return "";
-  if (!count) return "没有找到";
-  const total = capped ? `前 ${count} 处` : `${count} 处`;
+  if (!count) return t("status.none");
+  const total = capped ? t("n.firstMatches", { n: count }) : matchesLabel(count);
   return current >= 0 ? `${current + 1} / ${total}` : total;
 }

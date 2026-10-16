@@ -5,6 +5,7 @@ import { TFile, type Vault } from "obsidian";
 import { UNIHAN_SEMANTIC, UNIHAN_TRAD_SIMP, UNIHAN_Z } from "../shared/unihan-variants";
 import { VariantTable, parseGroupLines } from "../shared/variants";
 import type { SearchScope, VariantSettings } from "./settings";
+import { t } from "../i18n";
 
 /** 折叠表各来源的登记情况，面板与设置页上显示 */
 export interface TableSource {
@@ -30,12 +31,12 @@ export async function buildTable(settings: VariantSettings, extra: readonly Grou
   const custom = parseGroupLines(settings.customGroups);
   if (custom.length) {
     for (const group of custom) table.addGroup(group);
-    sources.push({ label: "自定义异体组", groups: custom.length });
+    sources.push({ label: t("src.custom"), groups: custom.length });
   }
   const unihan: Array<[boolean, string, string]> = [
-    [settings.unihanTradSimp, "Unihan 繁简对应", UNIHAN_TRAD_SIMP],
-    [settings.unihanZ, "Unihan 同字异写", UNIHAN_Z],
-    [settings.unihanSemantic, "Unihan 语义异体", UNIHAN_SEMANTIC]
+    [settings.unihanTradSimp, t("src.tradSimp"), UNIHAN_TRAD_SIMP],
+    [settings.unihanZ, t("src.z"), UNIHAN_Z],
+    [settings.unihanSemantic, t("src.semantic"), UNIHAN_SEMANTIC]
   ];
   for (const [on, label, packed] of unihan) {
     if (!on) continue;
@@ -70,7 +71,7 @@ export function filesInScope(vault: Vault, scope: SearchScope, activePath: strin
   if (scope === "folder" && activePath) {
     const root = activePath.includes("/") ? activePath.slice(0, activePath.lastIndexOf("/")) : "";
     const prefix = root ? `${root}/` : "";
-    return { files: all.filter((file) => file.path.startsWith(prefix)), label: root ? `文件夹 ${root}` : "库根目录" };
+    return { files: all.filter((file) => file.path.startsWith(prefix)), label: root ? t("scope.folderLabel", { name: root }) : t("scope.root") };
   }
-  return { files: all, label: "全库" };
+  return { files: all, label: t("scope.vault") };
 }

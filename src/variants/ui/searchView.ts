@@ -10,6 +10,7 @@ import { buildTrailTree, groupByBlock, type TreeNode } from "../../shared/result
 import type { SearchOptions, TrailItem } from "../search";
 import type { SearchScope } from "../settings";
 import type { FileHit } from "../main";
+import { filesLabel, matchesLabel, t, type MessageKey } from "../../i18n";
 
 /** 树形里的一处命中：带上它在整个结果表里的下标，点击和上一处／下一处靠它定位 */
 interface IndexedHit {
@@ -23,15 +24,15 @@ export const VARIANT_SEARCH_VIEW = "bsrv-variants";
 
 const SEARCH_DELAY = 350;
 
-const OPTION_LABELS: Array<{ key: keyof SearchOptions; label: string; title: string }> = [
-  { key: "variants", label: "异体字等同", title: "按对照表把异体当同一个字（邺＝鄴）；对照表来源在设置里选" },
-  { key: "crossAnchors", label: "跨页码与折行", title: "词被 <!--p.N--> 页码锚点或换行切开时照样能搜到" },
-  { key: "crossMarkup", label: "跨标注与注释", title: "词中间夹着高亮标签、%%备注%%、脚注号时照样能搜到" },
-  { key: "ignorePunct", label: "忽略标点", title: "标点不参与比对：「乙酉春」也能搜到「乙酉，春」" },
-  { key: "titlesOnly", label: "只搜标题", title: "只在 # 标题行里找" }
+const OPTION_LABELS: Array<{ key: keyof SearchOptions; label: MessageKey; title: MessageKey }> = [
+  { key: "variants", label: "vs.optVariants", title: "vs.optVariantsTip" },
+  { key: "crossAnchors", label: "vs.optCross", title: "vs.optCrossTip" },
+  { key: "crossMarkup", label: "vs.optMarkup", title: "vs.optMarkupTip" },
+  { key: "ignorePunct", label: "vs.optPunct", title: "vs.optPunctTip" },
+  { key: "titlesOnly", label: "vs.optTitles", title: "vs.optTitlesTip" }
 ];
 
-const SCOPE_LABELS: Record<SearchScope, string> = { file: "当前文件", folder: "当前文件夹", vault: "全库" };
+const SCOPE_LABELS: Record<SearchScope, MessageKey> = { file: "scope.file", folder: "scope.folder", vault: "scope.vault" };
 
 export class VariantSearchView extends ItemView {
   private inputEl!: HTMLInputElement;
@@ -50,7 +51,7 @@ export class VariantSearchView extends ItemView {
     return VARIANT_SEARCH_VIEW;
   }
   getDisplayText(): string {
-    return "查找（异体字）";
+    return t("vs.title");
   }
   getIcon(): string {
     return "search";
@@ -63,18 +64,18 @@ export class VariantSearchView extends ItemView {
 
     const bar = root.createDiv({ cls: "bsrv-vs-bar" });
     const box = bar.createDiv({ cls: "bsrv-vs-box" });
-    this.inputEl = box.createEl("input", { type: "search", cls: "bsrv-vs-input", attr: { placeholder: "输入要找的字词", spellcheck: "false" } });
-    const clear = box.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": "清空" } });
+    this.inputEl = box.createEl("input", { type: "search", cls: "bsrv-vs-input", attr: { placeholder: t("vs.placeholder"), spellcheck: "false" } });
+    const clear = box.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": t("find.clear") } });
     setIcon(clear, "x-circle");
     clear.addEventListener("click", () => {
       this.inputEl.value = "";
       this.show([], "");
       this.inputEl.focus();
     });
-    const prev = bar.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": "上一处（Shift+Enter）" } });
+    const prev = bar.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": t("find.prev") } });
     setIcon(prev, "arrow-left");
     prev.addEventListener("click", () => void this.step(-1));
-    const next = bar.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": "下一处（Enter）" } });
+    const next = bar.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": t("find.next") } });
     setIcon(next, "arrow-right");
     next.addEventListener("click", () => void this.step(1));
 
@@ -93,10 +94,10 @@ export class VariantSearchView extends ItemView {
     const options = root.createDiv({ cls: "bsrv-vs-options" });
     const settings = this.module.settings;
     for (const { key, label, title } of OPTION_LABELS) {
-      const item = options.createEl("label", { cls: "bsrv-vs-option", attr: { title } });
+      const item = options.createEl("label", { cls: "bsrv-vs-option", attr: { title: t(title) } });
       const check = item.createEl("input", { type: "checkbox" });
       check.checked = settings.options[key];
-      item.appendText(label);
+      item.appendText(t(label));
       check.addEventListener("change", () => {
         settings.options[key] = check.checked;
         void this.module.saveSettings();
@@ -106,7 +107,7 @@ export class VariantSearchView extends ItemView {
 
     const tools = root.createDiv({ cls: "bsrv-vs-tools" });
     const scope = tools.createEl("select", { cls: "dropdown bsrv-vs-scope" });
-    for (const [value, label] of Object.entries(SCOPE_LABELS)) scope.createEl("option", { value, text: label });
+    for (const [value, label] of Object.entries(SCOPE_LABELS)) scope.createEl("option", { value, text: t(label) });
     scope.value = settings.scope;
     scope.addEventListener("change", () => {
       settings.scope = scope.value as SearchScope;
@@ -117,7 +118,7 @@ export class VariantSearchView extends ItemView {
     const syncViewToggle = () => {
       const tree = settings.resultView === "tree";
       setIcon(viewToggle, tree ? "list-tree" : "list");
-      viewToggle.setAttribute("aria-label", tree ? "现在是树形显示，点一下换成紧凑列表" : "现在是紧凑列表，点一下换成树形显示");
+      viewToggle.setAttribute("aria-label", t(tree ? "view.isTree" : "view.isCompact"));
     };
     syncViewToggle();
     viewToggle.addEventListener("click", () => {
@@ -128,7 +129,7 @@ export class VariantSearchView extends ItemView {
       this.show(this.hits, this.statusEl.getText());
       if (selected >= 0) this.markCurrent(selected);
     });
-    const core = tools.createEl("button", { text: "在 Obsidian 搜索中打开", attr: { title: "把查询改写成带异体的正则，送进 Obsidian 自带搜索（自带搜索跨不过页码锚点与标注）" } });
+    const core = tools.createEl("button", { text: t("vs.openCore"), attr: { title: t("vs.openCoreTip") } });
     core.addEventListener("click", () => this.module.openCoreSearch(this.inputEl.value));
 
     this.statusEl = root.createDiv({ cls: "bsrv-vs-status" });
@@ -171,19 +172,19 @@ export class VariantSearchView extends ItemView {
       this.show([], "");
       return;
     }
-    this.statusEl.setText("查找中……");
+    this.statusEl.setText(t("vs.searching"));
     try {
       const result = await this.module.search(query, () => id !== this.runId);
       if (id !== this.runId) return;
-      const capped = result.hits.length >= this.module.settings.maxResults ? `（只列前 ${this.module.settings.maxResults} 处，可在设置里调）` : "";
+      const capped = result.hits.length >= this.module.settings.maxResults ? t("vs.capped", { n: this.module.settings.maxResults }) : "";
       const summary = result.hits.length
-        ? `${result.scopeLabel}：${result.hits.length} 处，${result.fileCount} 个文件${capped}`
-        : `${result.scopeLabel}：没有找到`;
+        ? t("vs.summary", { scope: result.scopeLabel, matches: matchesLabel(result.hits.length), files: filesLabel(result.fileCount) }) + capped
+        : t("vs.notFound", { scope: result.scopeLabel });
       const note = result.notes.length ? `\n${result.notes.join("；")}` : "";
       this.show(result.hits, summary + note);
     } catch (error) {
       if (id !== this.runId) return;
-      this.show([], `查找出错：${error instanceof Error ? error.message : String(error)}`);
+      this.show([], t("vs.error", { message: error instanceof Error ? error.message : String(error) }));
     }
   }
 
@@ -209,7 +210,7 @@ export class VariantSearchView extends ItemView {
       const meta = row.createDiv({ cls: "bsrv-vs-meta" });
       if (hit.page !== null) meta.createSpan({ cls: "bsrv-vs-page", text: `p.${hit.page}` });
       if (hit.entry) meta.createSpan({ cls: "bsrv-vs-entry", text: hit.entry });
-      if (hit.viaCandidate) meta.createSpan({ cls: "bsrv-vs-flag", text: "另读", attr: { title: "这处是按存疑字的另一种读法命中的" } });
+      if (hit.viaCandidate) meta.createSpan({ cls: "bsrv-vs-flag", text: t("vs.flag"), attr: { title: t("vs.flagTip") } });
       const text = row.createDiv({ cls: "bsrv-vs-text" });
       text.appendText(hit.before);
       text.createEl("mark", { text: hit.match });
@@ -247,7 +248,7 @@ export class VariantSearchView extends ItemView {
   }
 
   private renderNode(parent: HTMLElement, node: TreeNode<IndexedHit>): void {
-    const body = this.createCollapsible(parent, node.title || "（无标题）", node.count, "bsrv-vs-heading");
+    const body = this.createCollapsible(parent, node.title || t("common.noHeading"), node.count, "bsrv-vs-heading");
     this.renderHits(body, node.hits);
     for (const child of node.children) this.renderNode(body, child);
   }
@@ -264,7 +265,7 @@ export class VariantSearchView extends ItemView {
     if (first.hit.page !== null || flagged) {
       const meta = card.createDiv({ cls: "bsrv-vs-meta" });
       if (first.hit.page !== null) meta.createSpan({ cls: "bsrv-vs-page", text: `p.${first.hit.page}` });
-      if (flagged) meta.createSpan({ cls: "bsrv-vs-flag", text: "另读", attr: { title: "这张卡片里有按存疑字的另一种读法命中的" } });
+      if (flagged) meta.createSpan({ cls: "bsrv-vs-flag", text: t("vs.flag"), attr: { title: t("vs.flagTipCard") } });
     }
     const text = card.createDiv({ cls: "bsrv-vs-text" });
     text.appendText(first.hit.blockBefore);
@@ -281,7 +282,7 @@ export class VariantSearchView extends ItemView {
   }
 
   private addCopyButton(actions: HTMLElement, hit: FileHit): void {
-    const copy = actions.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "复制出处" } });
+    const copy = actions.createEl("button", { cls: "clickable-icon", attr: { "aria-label": t("vs.copyCite") } });
     setIcon(copy, "copy");
     copy.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -291,7 +292,7 @@ export class VariantSearchView extends ItemView {
 
   private async step(delta: number): Promise<void> {
     if (!this.hits.length) {
-      if (this.inputEl.value.trim()) new Notice("没有找到");
+      if (this.inputEl.value.trim()) new Notice(t("notice.noMatches"));
       return;
     }
     const next = this.current < 0 ? (delta > 0 ? 0 : this.hits.length - 1) : (this.current + delta + this.hits.length) % this.hits.length;

@@ -13,6 +13,7 @@ import { buildTable, filesInScope, type BuiltTable, type GroupSource } from "./s
 import { VARIANT_SEARCH_VIEW, VariantSearchView } from "./ui/searchView";
 import { renderVariantsSettings } from "./ui/settingsTab";
 import { revealRange } from "./ui/navigate";
+import { t } from "../i18n";
 
 export interface FileHit extends Hit {
   path: string;
@@ -52,7 +53,7 @@ export default class VariantsModule extends PluginModule {
     this.settings = normalizeVariantSettings(await this.loadData());
     this.registerView(VARIANT_SEARCH_VIEW, (leaf) => new VariantSearchView(leaf, this));
     this.registerCommands();
-    this.addRibbonIcon("search", "查找（异体字、跨页）", () => void this.openView());
+    this.addRibbonIcon("search", t("cmd.search"), () => void this.openView());
 
     this.rememberActive();
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.rememberActive()));
@@ -129,12 +130,12 @@ export default class VariantsModule extends PluginModule {
   private registerCommands(): void {
     this.addCommand({
       id: "variant-search-open",
-      name: "查找（异体字、跨页）",
+      name: t("cmd.search"),
       callback: () => void this.openView()
     });
     this.addCommand({
       id: "variant-search-selection",
-      name: "用选中的文字查找（异体字、跨页）",
+      name: t("cmd.searchSelection"),
       editorCallback: (editor) => {
         const selection = editor.getSelection().trim();
         void this.openView(selection || undefined);
@@ -142,7 +143,7 @@ export default class VariantsModule extends PluginModule {
     });
     this.addCommand({
       id: "variant-search-core",
-      name: "用选中的文字做异体扩展搜索（Obsidian 自带搜索）",
+      name: t("cmd.coreSearch"),
       editorCallback: (editor) => this.openCoreSearch(editor.getSelection())
     });
   }
@@ -178,7 +179,7 @@ export default class VariantsModule extends PluginModule {
     const options = this.settings.options;
     const scope = filesInScope(this.app.vault, this.settings.scope, this.lastMarkdown);
     const notes = sources.filter((source) => source.error).map((source) => `${source.label}：${source.error}`);
-    if (options.variants && table.empty) notes.push("对照表是空的：到设置里打开 Unihan 表或加自定义异体组");
+    if (options.variants && table.empty) notes.push(t("note.tableEmpty"));
     const hits: FileHit[] = [];
     let fileCount = 0;
     const files = [...scope.files].sort((a, b) => a.path.localeCompare(b.path, "zh"));
@@ -196,17 +197,17 @@ export default class VariantsModule extends PluginModule {
 
   async reveal(hit: FileHit): Promise<void> {
     const ok = await revealRange(this.app, hit.path, hit.from, hit.to, hit.line);
-    if (!ok) new Notice(`打不开：${hit.path}`);
+    if (!ok) new Notice(t("notice.cannotOpen", { path: hit.path }));
   }
 
   /** 复制出处：「《文件名》「条目」条p.764」，有页码标记或标题时才加上 */
   async copyCitation(hit: FileHit): Promise<void> {
-    const parts = [`《${hit.path.replace(/\.md$/, "").split("/").pop()}》`];
-    if (hit.entry) parts.push(`「${hit.entry}」条`);
-    if (hit.page !== null) parts.push(`p.${hit.page}`);
+    const parts = [t("cite.title", { title: hit.path.replace(/\.md$/, "").split("/").pop() ?? hit.path })];
+    if (hit.entry) parts.push(t("cite.entry", { entry: hit.entry }));
+    if (hit.page !== null) parts.push(t("cite.page", { page: hit.page }));
     const citation = parts.join("");
     await navigator.clipboard.writeText(citation);
-    new Notice(`已复制：${citation}`);
+    new Notice(t("notice.copied", { text: citation }));
   }
 
   /** 把查询改写成带异体的正则，送进 Obsidian 自带搜索 */
@@ -214,7 +215,7 @@ export default class VariantsModule extends PluginModule {
     void (async () => {
       const trimmed = query.trim();
       if (!trimmed) {
-        new Notice("先输入或选中要找的字词");
+        new Notice(t("notice.needQuery"));
         return;
       }
       const { table } = await this.table();
@@ -222,7 +223,7 @@ export default class VariantsModule extends PluginModule {
       const internal = (this.app as unknown as { internalPlugins?: InternalPluginsLike }).internalPlugins;
       const search = internal?.getPluginById("global-search");
       if (!search?.enabled || !search.instance) {
-        new Notice("Obsidian 自带的「搜索」核心插件没有开启");
+        new Notice(t("notice.noCoreSearch"));
         return;
       }
       search.instance.openGlobalSearch(regex);

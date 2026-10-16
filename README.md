@@ -1,61 +1,66 @@
-# Better Search Result Views
+# Better Search Result Views（汉字检索）
 
-Search tools for people who work with Chinese historical texts in Obsidian. This is an independent plugin; it is not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
+给在 Obsidian 里整理古籍、史料转写的人用的检索插件。本插件独立开发，与 [Better Search Views](https://github.com/ivan-lednev/better-search-views) 没有隶属关系，参考关系见文末「致谢」。
 
-- **Variant-aware search.** `鄴` and `邺`, `於` and `于`, `後` and `后` are treated as the same character. The equivalence table is used for searching only; your notes are never rewritten.
-- **Search across breaks.** A word that is split by a line break, a page marker like `<!--p.764-->`, an inline HTML tag, a `%%comment%%` or a footnote mark is still found.
-- **Two ways to search.**
-  - *Find in note*: a floating panel on the note (can take over `Ctrl+F`). It lists every match; click one to jump.
-  - *Variant search*: a sidebar panel that searches the current file, the current folder, or the whole vault, and shows the page marker and the nearest heading for each hit.
-- **Two result views, switchable on the panel.** *Tree*: file, then the chain of headings, then the paragraph that holds each match with the match highlighted (several matches in one paragraph share one card; headings fold). *Compact*: one line per match. The sidebar starts in tree view, the find-in-note panel in compact view.
+- **异体字当同一个字找。** 「鄴／邺」「於／于」「後／后」互通。对照表只用于检索，不会改你的笔记。
+- **切开的词也找得到。** 词被换行、`<!--p.764-->` 页码标记、HTML 标签、`%%备注%%` 或脚注号切开，照样命中。
+- **两个入口。**
+  - **文内查找**：正文上浮一个面板（可接管 `Ctrl+F`），列出全部命中，点哪条跳哪条。
+  - **异体字检索**：侧栏面板，范围可选当前文件、当前文件夹或全库，每条结果带页码标记和所在标题。
+- **结果有两种显示，面板上可切换。**
+  - **树形**：文件 → 标题链 → 命中所在的段落，命中字高亮；同一段里的几处命中并成一张卡片，标题可折叠。
+  - **紧凑**：一处一行。
+  - 侧栏默认树形，文内查找默认紧凑。
 
-No network access, no telemetry, no account. Works on desktop and mobile.
+不联网、无遥测、不需要账号，电脑和手机都能用。界面语言跟随 Obsidian：中文和繁体中文显示中文，其余显示英文。
 
-## Usage
+## 使用
 
-The interface is currently in Chinese only (English UI is planned). Command names as they appear in the command palette:
+命令面板里的命令名（英文界面下是对应的英文）：
 
-- **文内查找（带结果列表）** (find in note, with result list) opens the floating panel. Selected text is used as the query.
-- **查找（异体字、跨页）** (variant search) opens the sidebar. The ribbon search icon does the same.
-- **用选中的文字做异体扩展搜索（Obsidian 自带搜索）** rewrites the selected text as a regular expression covering its variants and hands it to Obsidian's built-in search.
-- Toggles on the panels: variants, ignore punctuation, cross page markers and line breaks, cross markup.
+- **文内查找（带结果列表）**：打开正文上的浮动面板；有选中的文字就拿它当查询。
+- **查找（异体字、跨页）**：打开侧栏。左侧功能区的搜索图标同样可以打开。
+- **用选中的文字做异体扩展搜索（Obsidian 自带搜索）**：把选中的字改写成覆盖其异体的正则，交给 Obsidian 自带搜索。
+- **Obsidian 自带的文内查找**：接管 `Ctrl+F` 之后，仍可从这里调出自带的查找条（含替换）。
+- 面板上的开关：异体、忽略标点、跨页码与折行、跨标注与注释、结果显示（树形／紧凑）。
 
-## Settings
+## 设置
 
-All settings are on one page: custom variant groups (one group per line, e.g. `於于`), the three Unicode Unihan tables (traditional/simplified, z-variants, semantic variants), the result limit, and whether the floating panel takes over `Ctrl+F`.
+所有设置在一页里：自定义异体组（一行一组，如 `於于`）、Unicode Unihan 的三张通用表（繁简对应、同字异写、语义异体）、最多列出几处、文内查找是否接管 `Ctrl+F`，以及面板的位置与大小。
 
-## Page markers
+## 页码标记
 
-If your notes are transcriptions of printed books, put `<!--p.N-->` where page N starts. Results then show the page number, and the search can match words that run across a page break.
+如果你的笔记是古籍或整理本的转写，在第 N 页开始的地方写 `<!--p.N-->`。结果里会显示页码，被页码标记切开的词也能找到。
 
-## Acknowledgements
+## 致谢
 
-The tree view of search results follows the idea of [Better Search Views](https://github.com/ivan-lednev/better-search-views) by ivan-lednev (MIT licence), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and does not change Obsidian's built-in search, backlinks or embedded queries; it draws its own panels.
+树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，也不改动 Obsidian 自带的搜索、反向链接和嵌入查询，而是自己绘制面板。
 
-## Data and licence
+## 数据与许可
 
-The Unihan variant tables are generated from the Unicode Character Database (Unihan, Unicode License v3; see `THIRD_PARTY_NOTICES.txt`). The plugin is MIT licensed.
+Unihan 异体表由 Unicode 字符数据库（Unihan，Unicode License v3）生成，详见 `THIRD_PARTY_NOTICES.txt`。本插件以 MIT 许可发布。
 
-## Development
+## 开发
 
 ```
 npm install
-npm run build   # dist/main.js, dist/styles.css, dist/manifest.json
+npm run build   # 生成 dist/main.js、dist/styles.css、dist/manifest.json
 npm test
-npx eslint src  # the official Obsidian review rules
-npm run unihan -- <Unihan.zip>   # regenerate the Unihan tables
+npx eslint src  # 官方的 Obsidian 审查规则
+npm run unihan -- <Unihan.zip>   # 重新生成 Unihan 对照表
 ```
 
 ---
 
-# 史学检索（简介）
+# Better Search Result Views (English summary)
 
-给在 Obsidian 里整理古籍、史料转写的人用的检索插件：
+Search tools for people who work with Chinese historical texts in Obsidian. An independent plugin, not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
 
-- 按异体对照表把「鄴／邺」「於／于」「後／后」当同一个字找，只用于检索，不改正文。
-- 词被换行、`<!--p.764-->` 页码标记、HTML 标签、`%%备注%%`、脚注号切开，照样找得到。
-- 两个入口：正文上的**文内查找**面板（可接管 Ctrl+F，列出全部命中）；侧栏的**异体字检索**（当前文件／当前文件夹／全库，结果带页码和所属标题）。
+- **Variant-aware search.** `鄴` and `邺`, `於` and `于`, `後` and `后` are treated as the same character. The table is used for searching only; your notes are never rewritten.
+- **Search across breaks.** Words split by a line break, a page marker such as `<!--p.764-->`, an inline HTML tag, a `%%comment%%` or a footnote mark are still found.
+- **Two panels.** *Find in note* floats over the note and can take over `Ctrl+F`; *Variant search* is a sidebar that searches the current file, the current folder or the whole vault.
+- **Two result views, switchable on the panel.** *Tree*: file, then the chain of headings, then the paragraph holding each match with the match highlighted (several matches in one paragraph share a card; headings fold). *Compact*: one line per match.
 
-- 结果有两种显示，面板上可切换：**树形**（文件 → 标题链 → 命中所在的段落，同一段里的几处并成一张卡片，标题可折叠）和**紧凑**（一处一行）。侧栏默认树形，文内查找默认紧凑。
+No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). MIT licence; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
 
-不联网、无遥测，电脑和手机都能用。设置集中在一页。树形显示的思路参考了 ivan-lednev 的 Better Search Views（MIT），代码为自己重写，与原作者无关。
+Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and does not change Obsidian's built-in search, backlinks or embedded queries; it draws its own panels.
