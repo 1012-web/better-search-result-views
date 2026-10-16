@@ -20,7 +20,7 @@ export interface VariantSettings {
   resultView: ResultView;
   /** 是否显示异体字功能：null 表示跟随界面语言（中文界面显示，其余隐藏） */
   showVariants: boolean | null;
-  /** 增强 Obsidian 自带搜索：在搜索框下加选项区（按勾选改写查询），结果加标题分层（实验性，默认关） */
+  /** 增强 Obsidian 自带搜索：在搜索框下加选项区（按勾选改写查询），结果加标题分层（默认开） */
   nativeEnhance: boolean;
   /** 第一次启用增强时，是否已经替用户把自带搜索的 ⚙ 菜单自动展开过一次 */
   nativeMenuIntroduced: boolean;
@@ -39,7 +39,7 @@ export const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   scope: "vault",
   resultView: "tree",
   showVariants: null,
-  nativeEnhance: false,
+  nativeEnhance: true,
   nativeMenuIntroduced: false,
   maxResults: 500
 };

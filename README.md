@@ -4,7 +4,7 @@
 
 - **结果按标题归类。** 命中归在各自的标题层级下面（文件 → 一级标题 → 二级标题 → 命中所在的段落），命中字高亮，标题可折叠；同一段里的几处命中合成一张卡片。
 - **文内查找。** 当前笔记里按 `Ctrl+F`（可选接管），弹出面板列出全部命中，点哪条跳哪条；不用再靠上下箭头逐处翻。
-- **侧栏搜索。** 范围可选当前文件、当前文件夹或全库；也可以让 Obsidian 自带的搜索面板直接显示成标题树（实验性，默认关闭）。
+- **侧栏搜索。** 范围可选当前文件、当前文件夹或全库；也可以让 Obsidian 自带的搜索面板直接显示成标题树（默认开启，可在设置里关）。
 - **切开的词也找得到。** 词被换行、HTML 标签、`%%备注%%`、脚注号或页码标记切开，照样命中。
 - **两种显示，面板上可切换。** 树形（见上）和紧凑（一处一行）；侧栏默认树形，文内查找默认紧凑。
 - **读中文古籍、史料转写的人另有两样。** 异体字当同一个字找（「鄴／邺」「於／于」「後／后」互通，对照表只用于检索，不改你的笔记）；笔记里用 `<!--p.12-->` 标出原书页码的话，结果会带页码（格式见下面的「页码标记」）。其他用途可以不管它们。
@@ -15,7 +15,7 @@
 
 ## 效果对比
 
-下面四组都是同一份笔记、同一个搜索词的真实截图。前三组是侧栏搜索：左边是 Obsidian 自带搜索，右边是打开设置里的「增强 Obsidian 自带搜索（实验性）」之后；第四组是文内查找。
+下面四组都是同一份笔记、同一个搜索词的真实截图。前三组是侧栏搜索：左边是 Obsidian 自带搜索，右边是开启设置里的「增强 Obsidian 自带搜索」之后（默认开启）；第四组是文内查找。
 
 **词被页码标记切开**：搜「威德被于四远」，自带搜索只找到没被切开的那一处；打开后，被 `<!--p.21-->` 页码标记切开的那一处也找到了。
 
@@ -57,13 +57,13 @@
 
 ## 致谢
 
-树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，自己的两个面板是自己绘制的；只有在设置里打开「增强 Obsidian 自带搜索（实验性）」时，才会读取并改动自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
+树形显示的思路参考了 ivan-lednev 的 [Better Search Views](https://github.com/ivan-lednev/better-search-views)（MIT 许可）：它把 Obsidian 自带的搜索结果显示成带标题层级的大纲。本插件没有使用它的代码，自己的两个面板是自己绘制的；只有开着设置里的「增强 Obsidian 自带搜索」时（默认开启），才会读取并改动自带搜索面板（详见下一节），反向链接和嵌入查询不受影响。
 
-## 实验性：增强 Obsidian 自带搜索
+## 增强 Obsidian 自带搜索
 
-设置里的「增强 Obsidian 自带搜索（实验性）」默认关闭。打开后，Obsidian 自带的「搜索」面板有两处变化：
+设置里的「增强 Obsidian 自带搜索」默认开启，可随时关掉。开着的时候，Obsidian 自带的「搜索」面板有两处变化：
 
-- **搜索增强选项。** 在搜索框右边 ⚙ 打开的菜单里，原有的三个开关下面多出一组「搜索增强」：异体字等同、跨页码与折行、跨标注与注释、忽略标点、只搜标题。有选项在起作用时，⚙ 按钮上会亮一个小圆点。第一次打开这个功能时，菜单会替你展开一次，之后听你自己的。
+- **搜索增强选项。** 在搜索框右边 ⚙ 打开的菜单里，原有的三个开关下面多出一组「搜索增强」：异体字等同、跨页码与折行、跨标注与注释、忽略标点、只搜标题。有选项在起作用时，⚙ 按钮上会亮一个小圆点。第一次用到这个功能时，菜单会替你展开一次，之后听你自己的。
 - **标题树。** 每条结果前补上它所在的标题行，按层级缩进，点标题行可折叠或展开它下面的结果。
 
 它是怎么起作用的：
@@ -102,7 +102,7 @@ This plugin improves how Obsidian shows search results:
 
 - **Results grouped by heading.** Each match sits under its heading levels (file, then H1, H2, and so on, then the paragraph holding the match) with the match highlighted. Headings fold, and several matches in one paragraph share a card.
 - **Find in note.** Press `Ctrl+F` (taking it over is optional) to get a panel that lists every match in the note; click one to jump to it instead of stepping with the arrows.
-- **Sidebar search.** Search the current file, the current folder or the whole vault. Optionally (experimental, off by default) Obsidian's own Search panel can show its results as a heading tree too.
+- **Sidebar search.** Search the current file, the current folder or the whole vault. Obsidian's own Search panel also shows its results as a heading tree, with a group of search options in its ⚙ menu (on by default; switch it off in settings).
 - **Search across breaks.** Words split by a line break, an inline HTML tag, a `%%comment%%`, a footnote mark or a page marker are still found.
 - **Two views, switchable on the panel.** Tree (above) and compact (one line per match); the sidebar defaults to tree, find in note to compact.
 - **Two extras if you read Chinese historical texts.** Variant characters count as the same (`鄴` and `邺`, `於` and `于`, `後` and `后`; the table is used for searching only and your notes are never rewritten), and page markers such as `<!--p.12-->` show up as page numbers in the results. You can ignore both otherwise.
@@ -113,7 +113,7 @@ No network access, no telemetry, no account; works on desktop and mobile. The in
 
 **Page markers.** If your notes mark where a printed page starts with an HTML comment such as `<!--p.12-->` (the number may be negative, and spaces inside the comment are fine), search results show the page number and words split by the marker are still found. Other styles such as `[p.12]` or `<p12>` are not recognised. Notes without such markers can still be searched and grouped by heading; they just don't show page numbers.
 
-**Before and after** (same notes, same query; left: Obsidian's own search, right: with the optional "Enhance Obsidian search" setting on). Put a phrase in quotes so Obsidian treats it as one phrase.
+**Before and after** (same notes, same query; left: Obsidian's own search, right: with the "Enhance Obsidian search" setting on, which is the default). Put a phrase in quotes so Obsidian treats it as one phrase.
 
 ![A phrase split by a page marker: 1 match before, 2 after](assets/guide/en-cross.png)
 
@@ -125,4 +125,4 @@ No network access, no telemetry, no account; works on desktop and mobile. The in
 
 Licence: MIT; Unihan data under the Unicode License v3 (see `THIRD_PARTY_NOTICES.txt`).
 
-Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. An optional, experimental setting (off by default) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.
+Acknowledgements: the tree view follows the idea of Better Search Views by ivan-lednev (MIT), which shows Obsidian's own search results as an outline of heading breadcrumbs. This plugin does not use its code and draws its own two panels. A setting (on by default, can be switched off) enhances Obsidian's built-in Search: a "Search enhancement" group of checkboxes (variants, across page markers and line breaks, and more) appears in the search settings menu, and results get heading levels and folding. The options only rewrite the words you type into a regular expression while a search runs. It reads and modifies that panel's internal structure, so it may stop working after an Obsidian update, in which case it turns itself off. Backlinks and embedded queries are not touched.
