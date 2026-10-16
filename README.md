@@ -1,6 +1,6 @@
 # Better Search Result Views（更好的搜索结果展示）
 
-让 Obsidian 的搜索结果按标题归类，一眼看清每个命中在笔记的哪一节。本插件独立开发，与 [Better Search Views](https://github.com/ivan-lednev/better-search-views) 没有隶属关系，参考关系见文末「致谢」。
+本插件优化了 Obsidian 的搜索结果展示方式：
 
 - **结果按标题归类。** 命中归在各自的标题层级下面（文件 → 一级标题 → 二级标题 → 命中所在的段落），命中字高亮，标题可折叠；同一段里的几处命中合成一张卡片。
 - **文内查找。** 当前笔记里按 `Ctrl+F`（可选接管），弹出面板列出全部命中，点哪条跳哪条；不用再靠上下箭头逐处翻。
@@ -8,6 +8,8 @@
 - **切开的词也找得到。** 词被换行、HTML 标签、`%%备注%%`、脚注号或页码标记切开，照样命中。
 - **两种显示，面板上可切换。** 树形（见上）和紧凑（一处一行）；侧栏默认树形，文内查找默认紧凑。
 - **读中文古籍、史料转写的人另有两样。** 异体字当同一个字找（「鄴／邺」「於／于」「後／后」互通，对照表只用于检索，不改你的笔记）；笔记里用 `<!--p.12-->` 标出原书页码的话，结果会带页码（格式见下面的「页码标记」）。其他用途可以不管它们。
+
+本插件独立开发，与 [Better Search Views](https://github.com/ivan-lednev/better-search-views) 没有隶属关系，参考关系见文末「致谢」。
 
 不联网、无遥测、不需要账号，电脑和手机都能用。界面语言跟随 Obsidian：中文和繁体中文显示中文，其余显示英文（英文界面默认不显示异体字功能，需要的话在设置里打开）。第一次启用时会弹出一个功能介绍，之后可以在命令面板里用「查看功能介绍」再打开。
 
@@ -96,7 +98,7 @@ npm run unihan -- <Unihan.zip>   # 重新生成 Unihan 对照表
 
 # Better Search Result Views (English summary)
 
-Search results grouped under their headings, so you see at a glance which section each match is in. An independent plugin, not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
+This plugin improves how Obsidian shows search results:
 
 - **Results grouped by heading.** Each match sits under its heading levels (file, then H1, H2, and so on, then the paragraph holding the match) with the match highlighted. Headings fold, and several matches in one paragraph share a card.
 - **Find in note.** Press `Ctrl+F` (taking it over is optional) to get a panel that lists every match in the note; click one to jump to it instead of stepping with the arrows.
@@ -104,6 +106,8 @@ Search results grouped under their headings, so you see at a glance which sectio
 - **Search across breaks.** Words split by a line break, an inline HTML tag, a `%%comment%%`, a footnote mark or a page marker are still found.
 - **Two views, switchable on the panel.** Tree (above) and compact (one line per match); the sidebar defaults to tree, find in note to compact.
 - **Two extras if you read Chinese historical texts.** Variant characters count as the same (`鄴` and `邺`, `於` and `于`, `後` and `后`; the table is used for searching only and your notes are never rewritten), and page markers such as `<!--p.12-->` show up as page numbers in the results. You can ignore both otherwise.
+
+An independent plugin, not affiliated with [Better Search Views](https://github.com/ivan-lednev/better-search-views) (see Acknowledgements).
 
 No network access, no telemetry, no account; works on desktop and mobile. The interface follows Obsidian's language (Chinese, or English otherwise). In the English interface the variant-character features are hidden by default (turn them on in settings if you read Chinese sources). A short feature guide opens the first time the plugin is enabled; reopen it any time with the command "Show feature guide".
 
