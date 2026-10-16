@@ -1,4 +1,4 @@
-# Hist Search
+# Better Search Result Views
 
 Search tools for people who work with Chinese historical texts in Obsidian.
 

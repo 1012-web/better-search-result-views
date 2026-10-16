@@ -1,28 +1,28 @@
 /* @settings
 
 name: 笔记1012 文内查找
-id: hist-search-find
+id: bsrv-find
 settings:
     -
-        id: hist-search-find-key
+        id: bsrv-find-key
         title: 结果列表里关键词的底色
         type: variable-color
         format: hex
         default: '#c2410c'
     -
-        id: hist-search-find-key-text
+        id: bsrv-find-key-text
         title: 关键词与当前命中的文字色
         type: variable-color
         format: hex
         default: '#ffffff'
     -
-        id: hist-search-find-hit
+        id: bsrv-find-hit
         title: 正文上各处命中的底色
         type: variable-color
         format: hex
         default: '#ffb300'
     -
-        id: hist-search-find-current
+        id: bsrv-find-current
         title: 正文上当前那处的底色
         type: variable-color
         format: hex
@@ -36,13 +36,13 @@ settings:
  * 不借 Obsidian 的高亮色变量——1.14 把 --text-highlight-bg 换成了 --highlight-background，借来的变量一失效底色就没了。
  */
 body {
-  --hist-search-find-key: #c2410c;
-  --hist-search-find-key-text: #ffffff;
-  --hist-search-find-hit: #ffb300;
-  --hist-search-find-current: #c2410c;
+  --bsrv-find-key: #c2410c;
+  --bsrv-find-key-text: #ffffff;
+  --bsrv-find-hit: #ffb300;
+  --bsrv-find-current: #c2410c;
 }
 
-.hist-search-find {
+.bsrv-find {
   position: absolute;
   /* 位置由面板自己按拖动的结果写在行内样式里，这里是它还没量出正文区大小时的初始值 */
   top: 8px;
@@ -51,9 +51,9 @@ body {
   display: flex;
   flex-direction: column;
   /* 宽度与最高高度可以拉（左下角的把手），拉过以后由面板写进这两个变量；没拉过用默认值 */
-  width: min(var(--hist-search-find-width, 420px), calc(100% - 16px));
-  /* 默认最高占正文区的六成；拖到下面时再扣掉上面那一截（--hist-search-find-top 由面板随位置更新） */
-  max-height: min(var(--hist-search-find-height, min(60%, 560px)), calc(100% - var(--hist-search-find-top, 8px) - 8px));
+  width: min(var(--bsrv-find-width, 420px), calc(100% - 16px));
+  /* 默认最高占正文区的六成；拖到下面时再扣掉上面那一截（--bsrv-find-top 由面板随位置更新） */
+  max-height: min(var(--bsrv-find-height, min(60%, 560px)), calc(100% - var(--bsrv-find-top, 8px) - 8px));
   min-height: 0;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
@@ -64,7 +64,7 @@ body {
   overflow: hidden;
 }
 
-.hist-search-find-head {
+.bsrv-find-head {
   display: flex;
   align-items: center;
   gap: 0.6em;
@@ -77,15 +77,15 @@ body {
   touch-action: none;
 }
 
-.hist-search-find-head:active {
+.bsrv-find-head:active {
   cursor: grabbing;
 }
 
-.hist-search-find-title {
+.bsrv-find-title {
   color: var(--text-muted);
 }
 
-.hist-search-find-status {
+.bsrv-find-status {
   flex: 1;
   text-align: right;
   color: var(--text-muted);
@@ -93,8 +93,8 @@ body {
   white-space: nowrap;
 }
 
-.hist-search-find-bar,
-.hist-search-find-tools {
+.bsrv-find-bar,
+.bsrv-find-tools {
   display: flex;
   align-items: center;
   gap: 0.2em;
@@ -102,11 +102,11 @@ body {
   padding: 0.35em 0.4em 0;
 }
 
-.hist-search-find-tools {
+.bsrv-find-tools {
   padding-bottom: 0.35em;
 }
 
-.hist-search-find-box {
+.bsrv-find-box {
   position: relative;
   flex: 1;
   display: flex;
@@ -114,17 +114,17 @@ body {
   min-width: 0;
 }
 
-input.hist-search-find-input {
+input.bsrv-find-input {
   width: 100%;
   padding-right: 2em;
 }
 
-.hist-search-find-box .hist-search-find-clear {
+.bsrv-find-box .bsrv-find-clear {
   position: absolute;
   right: 0.15em;
 }
 
-.hist-search-find-icon.clickable-icon {
+.bsrv-find-icon.clickable-icon {
   flex: none;
   padding: 0.25em;
   height: auto;
@@ -132,12 +132,12 @@ input.hist-search-find-input {
   background: transparent;
 }
 
-.hist-search-find-icon.clickable-icon.is-active {
+.bsrv-find-icon.clickable-icon.is-active {
   background: var(--background-modifier-active-hover);
   color: var(--text-accent);
 }
 
-button.hist-search-find-toggle {
+button.bsrv-find-toggle {
   height: auto;
   padding: 0.1em 0.55em;
   font-size: var(--font-ui-smaller);
@@ -149,27 +149,27 @@ button.hist-search-find-toggle {
   cursor: pointer;
 }
 
-button.hist-search-find-toggle:hover:not(:disabled) {
+button.bsrv-find-toggle:hover:not(:disabled) {
   background: var(--background-modifier-hover);
 }
 
-button.hist-search-find-toggle.is-active {
+button.bsrv-find-toggle.is-active {
   color: var(--text-accent);
   border-color: var(--interactive-accent);
   background: var(--background-modifier-active-hover);
 }
 
-button.hist-search-find-toggle:disabled {
+button.bsrv-find-toggle:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.hist-search-find-spacer {
+.bsrv-find-spacer {
   flex: 1;
 }
 
 /* 结果列表：一处命中一行。position 让各行的 offsetTop 相对列表算（面板据此只滚列表自己） */
-.hist-search-find-list {
+.bsrv-find-list {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
@@ -177,12 +177,12 @@ button.hist-search-find-toggle:disabled {
   border-top: 2px solid var(--interactive-accent);
 }
 
-.hist-search-find.is-list-hidden .hist-search-find-list,
-.hist-search-find.is-empty .hist-search-find-list {
+.bsrv-find.is-list-hidden .bsrv-find-list,
+.bsrv-find.is-empty .bsrv-find-list {
   display: none;
 }
 
-.hist-search-find-row {
+.bsrv-find-row {
   display: flex;
   align-items: baseline;
   gap: 0.6em;
@@ -191,16 +191,16 @@ button.hist-search-find-toggle:disabled {
   cursor: pointer;
 }
 
-.hist-search-find-row:hover {
+.bsrv-find-row:hover {
   background: var(--background-modifier-hover);
 }
 
-.hist-search-find-row.is-current {
+.bsrv-find-row.is-current {
   background: var(--background-modifier-active-hover);
   box-shadow: inset 3px 0 0 var(--interactive-accent);
 }
 
-.hist-search-find-text {
+.bsrv-find-text {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -210,9 +210,9 @@ button.hist-search-find-toggle:disabled {
 }
 
 /* 关键词：深橙实底、白字，在深浅主题里都跳得出来（亮橙底配黑字更像 BookxNote，站长嫌黑字突兀，2026-10-11 改成这样） */
-.hist-search-find-text mark {
-  background: var(--hist-search-find-key);
-  color: var(--hist-search-find-key-text);
+.bsrv-find-text mark {
+  background: var(--bsrv-find-key);
+  color: var(--bsrv-find-key-text);
   font-weight: var(--font-bold);
   padding: 0 0.15em;
   margin: 0 0.05em;
@@ -220,7 +220,7 @@ button.hist-search-find-toggle:disabled {
   mix-blend-mode: normal;
 }
 
-.hist-search-find-page {
+.bsrv-find-page {
   flex: none;
   color: var(--text-faint);
   font-size: var(--font-ui-smaller);
@@ -228,11 +228,11 @@ button.hist-search-find-toggle:disabled {
 }
 
 /* 拉大小的把手在左下角（面板靠右上角定位）。结果少时面板是收拢的：拉的时候临时撑到设定的高度，看得清拉到了哪 */
-.hist-search-find.is-resizing {
-  height: var(--hist-search-find-height);
+.bsrv-find.is-resizing {
+  height: var(--bsrv-find-height);
 }
 
-.hist-search-find-resize {
+.bsrv-find-resize {
   position: absolute;
   left: 0;
   bottom: 0;
@@ -242,7 +242,7 @@ button.hist-search-find-toggle:disabled {
   touch-action: none;
 }
 
-.hist-search-find-resize::after {
+.bsrv-find-resize::after {
   content: "";
   position: absolute;
   left: 2px;
@@ -254,36 +254,36 @@ button.hist-search-find-toggle:disabled {
   border-bottom-left-radius: 3px;
 }
 
-.hist-search-find-resize:hover::after,
-.hist-search-find.is-resizing .hist-search-find-resize::after {
+.bsrv-find-resize:hover::after,
+.bsrv-find.is-resizing .bsrv-find-resize::after {
   border-color: var(--interactive-accent);
 }
 
 /* 没有列表可看时不用拉大小，把手收起来，免得压在开关上 */
-.hist-search-find.is-list-hidden:not(.is-resizing) .hist-search-find-resize,
-.hist-search-find.is-empty:not(.is-resizing) .hist-search-find-resize {
+.bsrv-find.is-list-hidden:not(.is-resizing) .bsrv-find-resize,
+.bsrv-find.is-empty:not(.is-resizing) .bsrv-find-resize {
   display: none;
 }
 
 /* 编辑模式：正文上的命中（CodeMirror 的装饰）。各处命中是半透明底色加细框（好与标注的高亮区分），当前那处与结果行里的关键词同一个样子：实底色、白字 */
-.hist-search-find-hit {
-  background-color: color-mix(in srgb, var(--hist-search-find-hit) 40%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hist-search-find-hit) 85%, transparent);
+.bsrv-find-hit {
+  background-color: color-mix(in srgb, var(--bsrv-find-hit) 40%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--bsrv-find-hit) 85%, transparent);
   border-radius: 2px;
 }
 
-.hist-search-find-hit.hist-search-find-current {
-  background-color: var(--hist-search-find-current);
-  color: var(--hist-search-find-key-text);
+.bsrv-find-hit.bsrv-find-current {
+  background-color: var(--bsrv-find-current);
+  color: var(--bsrv-find-key-text);
   box-shadow: 0 0 0 2px var(--interactive-accent);
 }
 
 /* 阅读模式：正文上的命中（CSS Custom Highlight，由 src/modules/find/preview.ts 登记范围） */
-::highlight(hist-search-find) {
-  background-color: color-mix(in srgb, var(--hist-search-find-hit) 45%, transparent);
+::highlight(bsrv-find) {
+  background-color: color-mix(in srgb, var(--bsrv-find-hit) 45%, transparent);
 }
 
-::highlight(hist-search-find-current) {
-  background-color: var(--hist-search-find-current);
-  color: var(--hist-search-find-key-text);
+::highlight(bsrv-find-current) {
+  background-color: var(--bsrv-find-current);
+  color: var(--bsrv-find-key-text);
 }

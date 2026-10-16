@@ -20,7 +20,7 @@ export function renderVariantsSettings(containerEl: HTMLElement, module: Variant
   new Setting(containerEl)
     .setName("自定义异体组")
     .setDesc("一行一组，同组的字互为异体，如「於于」「鄴邺」。字与字之间可以不加分隔。");
-  const custom = containerEl.createEl("textarea", { cls: "hist-search-vs-textarea", attr: { rows: "6", spellcheck: "false", "data-setting": "customGroups" } });
+  const custom = containerEl.createEl("textarea", { cls: "bsrv-vs-textarea", attr: { rows: "6", spellcheck: "false", "data-setting": "customGroups" } });
   custom.value = s.customGroups;
   custom.addEventListener("change", () => {
     s.customGroups = custom.value;
@@ -61,7 +61,7 @@ export function renderVariantsSettings(containerEl: HTMLElement, module: Variant
       await module.saveSettings();
     }));
 
-  const summary = containerEl.createDiv({ cls: "hist-search-vs-sources" });
+  const summary = containerEl.createDiv({ cls: "bsrv-vs-sources" });
   renderSources(summary, module);
 }
 

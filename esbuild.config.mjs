@@ -14,7 +14,7 @@ function buildStyles() {
 }
 
 const stylesPlugin = {
-  name: "hist-search-styles",
+  name: "bsrv-styles",
   setup(build) {
     build.onEnd(() => buildStyles());
   }

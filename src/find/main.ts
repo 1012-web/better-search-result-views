@@ -98,7 +98,7 @@ export default class FindModule extends PluginModule {
     try {
       return (await this.variants.table()).table;
     } catch (error) {
-      console.error("[hist-search] 文内查找读异体对照表出错", error);
+      console.error("[bsrv] 文内查找读异体对照表出错", error);
       return null;
     }
   }

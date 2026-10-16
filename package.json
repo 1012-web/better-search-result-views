@@ -1,5 +1,5 @@
 {
-  "name": "hist-search",
+  "name": "better-search-result-views",
   "version": "0.1.0",
   "private": true,
   "description": "Obsidian plugin: variant-character-aware find in note and vault",

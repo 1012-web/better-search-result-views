@@ -14,8 +14,8 @@ export interface FindMarks {
 /** 换一批命中；null 表示清掉 */
 export const setFindMarks = StateEffect.define<FindMarks | null>();
 
-const hitMark = Decoration.mark({ class: "hist-search-find-hit" });
-const currentMark = Decoration.mark({ class: "hist-search-find-hit hist-search-find-current" });
+const hitMark = Decoration.mark({ class: "bsrv-find-hit" });
+const currentMark = Decoration.mark({ class: "bsrv-find-hit bsrv-find-current" });
 
 function build(marks: FindMarks | null, length: number): DecorationSet {
   if (!marks) return Decoration.none;

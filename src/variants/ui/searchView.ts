@@ -9,7 +9,7 @@ import type { SearchScope } from "../settings";
 import type { FileHit } from "../main";
 
 /** 视图类型名：发布后不要再改，否则已保存的侧栏布局恢复不了 */
-export const VARIANT_SEARCH_VIEW = "hist-search-variants";
+export const VARIANT_SEARCH_VIEW = "bsrv-variants";
 
 const SEARCH_DELAY = 350;
 
@@ -49,22 +49,22 @@ export class VariantSearchView extends ItemView {
   async onOpen(): Promise<void> {
     const root = this.contentEl;
     root.empty();
-    root.addClass("hist-search-vs");
+    root.addClass("bsrv-vs");
 
-    const bar = root.createDiv({ cls: "hist-search-vs-bar" });
-    const box = bar.createDiv({ cls: "hist-search-vs-box" });
-    this.inputEl = box.createEl("input", { type: "search", cls: "hist-search-vs-input", attr: { placeholder: "输入要找的字词", spellcheck: "false" } });
-    const clear = box.createEl("button", { cls: "hist-search-vs-icon clickable-icon", attr: { "aria-label": "清空" } });
+    const bar = root.createDiv({ cls: "bsrv-vs-bar" });
+    const box = bar.createDiv({ cls: "bsrv-vs-box" });
+    this.inputEl = box.createEl("input", { type: "search", cls: "bsrv-vs-input", attr: { placeholder: "输入要找的字词", spellcheck: "false" } });
+    const clear = box.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": "清空" } });
     setIcon(clear, "x-circle");
     clear.addEventListener("click", () => {
       this.inputEl.value = "";
       this.show([], "");
       this.inputEl.focus();
     });
-    const prev = bar.createEl("button", { cls: "hist-search-vs-icon clickable-icon", attr: { "aria-label": "上一处（Shift+Enter）" } });
+    const prev = bar.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": "上一处（Shift+Enter）" } });
     setIcon(prev, "arrow-left");
     prev.addEventListener("click", () => void this.step(-1));
-    const next = bar.createEl("button", { cls: "hist-search-vs-icon clickable-icon", attr: { "aria-label": "下一处（Enter）" } });
+    const next = bar.createEl("button", { cls: "bsrv-vs-icon clickable-icon", attr: { "aria-label": "下一处（Enter）" } });
     setIcon(next, "arrow-right");
     next.addEventListener("click", () => void this.step(1));
 
@@ -80,10 +80,10 @@ export class VariantSearchView extends ItemView {
       } else void this.step(event.shiftKey ? -1 : 1);
     });
 
-    const options = root.createDiv({ cls: "hist-search-vs-options" });
+    const options = root.createDiv({ cls: "bsrv-vs-options" });
     const settings = this.module.settings;
     for (const { key, label, title } of OPTION_LABELS) {
-      const item = options.createEl("label", { cls: "hist-search-vs-option", attr: { title } });
+      const item = options.createEl("label", { cls: "bsrv-vs-option", attr: { title } });
       const check = item.createEl("input", { type: "checkbox" });
       check.checked = settings.options[key];
       item.appendText(label);
@@ -94,8 +94,8 @@ export class VariantSearchView extends ItemView {
       });
     }
 
-    const tools = root.createDiv({ cls: "hist-search-vs-tools" });
-    const scope = tools.createEl("select", { cls: "dropdown hist-search-vs-scope" });
+    const tools = root.createDiv({ cls: "bsrv-vs-tools" });
+    const scope = tools.createEl("select", { cls: "dropdown bsrv-vs-scope" });
     for (const [value, label] of Object.entries(SCOPE_LABELS)) scope.createEl("option", { value, text: label });
     scope.value = settings.scope;
     scope.addEventListener("change", () => {
@@ -106,8 +106,8 @@ export class VariantSearchView extends ItemView {
     const core = tools.createEl("button", { text: "在 Obsidian 搜索中打开", attr: { title: "把查询改写成带异体的正则，送进 Obsidian 自带搜索（自带搜索跨不过页码锚点与标注）" } });
     core.addEventListener("click", () => this.module.openCoreSearch(this.inputEl.value));
 
-    this.statusEl = root.createDiv({ cls: "hist-search-vs-status" });
-    this.listEl = root.createDiv({ cls: "hist-search-vs-list" });
+    this.statusEl = root.createDiv({ cls: "bsrv-vs-status" });
+    this.listEl = root.createDiv({ cls: "bsrv-vs-list" });
     this.inputEl.focus();
   }
 
@@ -171,18 +171,18 @@ export class VariantSearchView extends ItemView {
     hits.forEach((hit, index) => {
       if (hit.path !== lastPath) {
         lastPath = hit.path;
-        this.listEl.createDiv({ cls: "hist-search-vs-file", text: hit.path.replace(/\.md$/, "") });
+        this.listEl.createDiv({ cls: "bsrv-vs-file", text: hit.path.replace(/\.md$/, "") });
       }
-      const row = this.listEl.createDiv({ cls: "hist-search-vs-row", attr: { "data-index": String(index) } });
-      const meta = row.createDiv({ cls: "hist-search-vs-meta" });
-      if (hit.page !== null) meta.createSpan({ cls: "hist-search-vs-page", text: `p.${hit.page}` });
-      if (hit.entry) meta.createSpan({ cls: "hist-search-vs-entry", text: hit.entry });
-      if (hit.viaCandidate) meta.createSpan({ cls: "hist-search-vs-flag", text: "另读", attr: { title: "这处是按存疑字的另一种读法命中的" } });
-      const text = row.createDiv({ cls: "hist-search-vs-text" });
+      const row = this.listEl.createDiv({ cls: "bsrv-vs-row", attr: { "data-index": String(index) } });
+      const meta = row.createDiv({ cls: "bsrv-vs-meta" });
+      if (hit.page !== null) meta.createSpan({ cls: "bsrv-vs-page", text: `p.${hit.page}` });
+      if (hit.entry) meta.createSpan({ cls: "bsrv-vs-entry", text: hit.entry });
+      if (hit.viaCandidate) meta.createSpan({ cls: "bsrv-vs-flag", text: "另读", attr: { title: "这处是按存疑字的另一种读法命中的" } });
+      const text = row.createDiv({ cls: "bsrv-vs-text" });
       text.appendText(hit.before);
       text.createEl("mark", { text: hit.match });
       text.appendText(hit.after);
-      const actions = row.createDiv({ cls: "hist-search-vs-actions" });
+      const actions = row.createDiv({ cls: "bsrv-vs-actions" });
       const copy = actions.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "复制出处" } });
       setIcon(copy, "copy");
       copy.addEventListener("click", (event) => {
@@ -206,8 +206,8 @@ export class VariantSearchView extends ItemView {
     const hit = this.hits[index];
     if (!hit) return;
     this.current = index;
-    for (const row of Array.from(this.listEl.querySelectorAll(".hist-search-vs-row.is-current"))) row.removeClass("is-current");
-    const row = this.listEl.querySelector(`.hist-search-vs-row[data-index="${index}"]`);
+    for (const row of Array.from(this.listEl.querySelectorAll(".bsrv-vs-row.is-current"))) row.removeClass("is-current");
+    const row = this.listEl.querySelector(`.bsrv-vs-row[data-index="${index}"]`);
     if (row instanceof HTMLElement) {
       row.addClass("is-current");
       row.scrollIntoView({ block: "nearest" });

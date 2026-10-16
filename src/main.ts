@@ -46,8 +46,8 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
    */
   renderSettings(containerEl: HTMLElement): void {
     containerEl.empty();
-    this.variants.renderSettings(containerEl.createDiv({ cls: "hist-search-settings-section" }));
-    this.find.renderSettings(containerEl.createDiv({ cls: "hist-search-settings-section" }));
+    this.variants.renderSettings(containerEl.createDiv({ cls: "bsrv-settings-section" }));
+    this.find.renderSettings(containerEl.createDiv({ cls: "bsrv-settings-section" }));
   }
 
   async loadSection(key: SectionKey): Promise<unknown> {
@@ -77,7 +77,7 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
       try {
         await module.onExternalDataChange?.(this.data.sections[key] ?? null);
       } catch (error) {
-        console.error(`[hist-search] 应用外部设置出错（${key}）`, error);
+        console.error(`[bsrv] 应用外部设置出错（${key}）`, error);
       }
     }
   }
@@ -86,7 +86,7 @@ export default class HistSearchPlugin extends Plugin implements SectionHost {
   private enqueue<T>(task: () => Promise<T>): Promise<T> {
     const run = this.saveChain.then(task);
     this.saveChain = run.then(() => undefined, (error: unknown) => {
-      console.error("[hist-search] 读写设置失败", error);
+      console.error("[bsrv] 读写设置失败", error);
     });
     return run;
   }

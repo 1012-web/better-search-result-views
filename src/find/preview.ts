@@ -13,8 +13,8 @@ import type { VariantTable } from "../shared/variants";
 import { searchText, type Hit, type SearchOptions } from "../variants/search";
 
 /** 样式表里 ::highlight(…) 用的名字 */
-export const HIGHLIGHT_ALL = "hist-search-find";
-export const HIGHLIGHT_CURRENT = "hist-search-find-current";
+export const HIGHLIGHT_ALL = "bsrv-find";
+export const HIGHLIGHT_CURRENT = "bsrv-find-current";
 
 /** 渲染出来但不属于正文的文字：名词模块挂的外文名、属性区、折叠箭头、代码块的复制按钮、脚注号 */
 const SKIP = ".note1012-term-foreign, .frontmatter, .frontmatter-container, .metadata-container, .collapse-indicator, .copy-code-button, sup.footnote-ref, .footnote-backref";
@@ -305,7 +305,7 @@ export class PreviewMarker {
       }
     } catch (error) {
       // 内部结构变了、对不上：不标，查找与跳转照常
-      console.error("[hist-search] 阅读模式标出命中时出错", error);
+      console.error("[bsrv] 阅读模式标出命中时出错", error);
     }
     this.currentRange = current;
     setMarks(win, this, { all, current });

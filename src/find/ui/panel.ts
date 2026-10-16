@@ -74,51 +74,51 @@ export class FindPanel {
 
   constructor(readonly view: MarkdownView, private readonly module: FindModule) {
     this.marker = new PreviewMarker(view);
-    this.root = view.contentEl.createDiv({ cls: "hist-search-find" });
+    this.root = view.contentEl.createDiv({ cls: "bsrv-find" });
 
-    const head = this.root.createDiv({ cls: "hist-search-find-head" });
-    head.createSpan({ cls: "hist-search-find-title", text: "查找" });
-    this.statusEl = head.createSpan({ cls: "hist-search-find-status" });
-    const close = head.createEl("button", { cls: "hist-search-find-icon clickable-icon", attr: { "aria-label": "关闭（Esc）" } });
+    const head = this.root.createDiv({ cls: "bsrv-find-head" });
+    head.createSpan({ cls: "bsrv-find-title", text: "查找" });
+    this.statusEl = head.createSpan({ cls: "bsrv-find-status" });
+    const close = head.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "关闭（Esc）" } });
     setIcon(close, "x");
     close.addEventListener("click", () => this.module.closePanel(this.view));
     this.enableDrag(head);
 
-    const bar = this.root.createDiv({ cls: "hist-search-find-bar" });
-    const box = bar.createDiv({ cls: "hist-search-find-box" });
-    this.inputEl = box.createEl("input", { type: "text", cls: "hist-search-find-input", attr: { placeholder: "在本篇里找", spellcheck: "false" } });
-    const clear = box.createEl("button", { cls: "hist-search-find-icon hist-search-find-clear clickable-icon", attr: { "aria-label": "清空" } });
+    const bar = this.root.createDiv({ cls: "bsrv-find-bar" });
+    const box = bar.createDiv({ cls: "bsrv-find-box" });
+    this.inputEl = box.createEl("input", { type: "text", cls: "bsrv-find-input", attr: { placeholder: "在本篇里找", spellcheck: "false" } });
+    const clear = box.createEl("button", { cls: "bsrv-find-icon bsrv-find-clear clickable-icon", attr: { "aria-label": "清空" } });
     setIcon(clear, "x-circle");
     clear.addEventListener("click", () => {
       this.inputEl.value = "";
       void this.run();
       this.inputEl.focus();
     });
-    const prev = bar.createEl("button", { cls: "hist-search-find-icon clickable-icon", attr: { "aria-label": "上一处（Shift+Enter）" } });
+    const prev = bar.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "上一处（Shift+Enter）" } });
     setIcon(prev, "arrow-left");
     prev.addEventListener("click", () => void this.step(-1));
-    const next = bar.createEl("button", { cls: "hist-search-find-icon clickable-icon", attr: { "aria-label": "下一处（Enter）" } });
+    const next = bar.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "下一处（Enter）" } });
     setIcon(next, "arrow-right");
     next.addEventListener("click", () => void this.step(1));
 
-    const tools = this.root.createDiv({ cls: "hist-search-find-tools" });
-    this.variantsButton = tools.createEl("button", { cls: "hist-search-find-toggle", text: "异体" });
+    const tools = this.root.createDiv({ cls: "bsrv-find-tools" });
+    this.variantsButton = tools.createEl("button", { cls: "bsrv-find-toggle", text: "异体" });
     this.variantsButton.addEventListener("click", () => void this.module.updateSettings({ variants: !this.module.settings.variants }));
     this.punctButton = tools.createEl("button", {
-      cls: "hist-search-find-toggle",
+      cls: "bsrv-find-toggle",
       text: "忽略标点",
       attr: { "aria-label": "标点不参与比对：「乙酉春」也能找到「乙酉，春」" }
     });
     this.punctButton.addEventListener("click", () => void this.module.updateSettings({ ignorePunct: !this.module.settings.ignorePunct }));
-    tools.createDiv({ cls: "hist-search-find-spacer" });
-    this.listButton = tools.createEl("button", { cls: "hist-search-find-icon clickable-icon", attr: { "aria-label": "显示查找结果列表" } });
+    tools.createDiv({ cls: "bsrv-find-spacer" });
+    this.listButton = tools.createEl("button", { cls: "bsrv-find-icon clickable-icon", attr: { "aria-label": "显示查找结果列表" } });
     setIcon(this.listButton, "list");
     this.listButton.addEventListener("click", () => void this.module.updateSettings({ showList: !this.module.settings.showList }));
 
-    this.listEl = this.root.createDiv({ cls: "hist-search-find-list" });
-    this.enableResize(this.root.createDiv({ cls: "hist-search-find-resize", attr: { "aria-label": "按住拖动：拉宽、拉高" } }));
+    this.listEl = this.root.createDiv({ cls: "bsrv-find-list" });
+    this.enableResize(this.root.createDiv({ cls: "bsrv-find-resize", attr: { "aria-label": "按住拖动：拉宽、拉高" } }));
     this.listEl.addEventListener("click", (event) => {
-      const row = (event.target as HTMLElement | null)?.closest<HTMLElement>(".hist-search-find-row");
+      const row = (event.target as HTMLElement | null)?.closest<HTMLElement>(".bsrv-find-row");
       const index = Number(row?.dataset.index);
       if (row && Number.isInteger(index)) void this.select(index);
     });
@@ -295,18 +295,18 @@ export class FindPanel {
       const hit = this.hits[index];
       const parts = rowParts({ ...lineContext(this.text, hit.from, hit.to), match: hit.match });
       const row = doc.createElement("div");
-      row.className = "hist-search-find-row";
+      row.className = "bsrv-find-row";
       row.dataset.index = String(index);
       if (hit.entry) row.title = hit.entry;
       const line = doc.createElement("span");
-      line.className = "hist-search-find-text";
+      line.className = "bsrv-find-text";
       const mark = doc.createElement("mark");
       mark.textContent = parts.match;
       line.append(parts.before, mark, parts.after);
       row.append(line);
       if (hit.page !== null) {
         const page = doc.createElement("span");
-        page.className = "hist-search-find-page";
+        page.className = "bsrv-find-page";
         page.textContent = `p.${hit.page}`;
         row.append(page);
       }
@@ -318,7 +318,7 @@ export class FindPanel {
 
   private paintCurrent(): void {
     const list = this.listEl;
-    list.querySelector(".hist-search-find-row.is-current")?.removeClass("is-current");
+    list.querySelector(".bsrv-find-row.is-current")?.removeClass("is-current");
     // 当前那处在还没建出来的行里：先建到它后面一点
     if (this.current >= this.rendered) this.renderRows(this.current + LIST_CHUNK / 2);
     const row = this.current >= 0 ? (list.children[this.current] as HTMLElement | undefined) : undefined;
@@ -338,7 +338,7 @@ export class FindPanel {
     try {
       editorView(this.view)?.dispatch({ effects: setFindMarks.of(source && this.hits.length ? { ranges: this.hits, current: this.current } : null) });
     } catch (error) {
-      console.error("[hist-search] 编辑模式标出命中时出错", error);
+      console.error("[bsrv] 编辑模式标出命中时出错", error);
     }
     // 实时预览里被换成 HTML 小部件的标注：装饰标不进去，由 marker 按渲染出来的文字补标
     this.marker.set(this.searched ? { ...this.searched, hits: this.hits, current: this.current } : null, source ? "widgets" : "preview");
@@ -462,9 +462,9 @@ export class FindPanel {
 
   /** 宽度与「结果多时最高多高」交给样式表里的两个变量；height 为 0 表示用默认的最高高度 */
   private resize(width: number, height: number): void {
-    this.root.style.setProperty("--hist-search-find-width", `${width}px`);
-    if (height > 0) this.root.style.setProperty("--hist-search-find-height", `${height}px`);
-    else this.root.style.removeProperty("--hist-search-find-height");
+    this.root.style.setProperty("--bsrv-find-width", `${width}px`);
+    if (height > 0) this.root.style.setProperty("--bsrv-find-height", `${height}px`);
+    else this.root.style.removeProperty("--bsrv-find-height");
   }
 
   /** 摆到指定位置（夹在正文区之内），返回实际摆到的位置 */
@@ -477,7 +477,7 @@ export class FindPanel {
     this.root.style.right = `${right}px`;
     this.root.style.top = `${top}px`;
     // 面板的最大高度要扣掉它上面那一截，见 styles/find.css
-    this.root.style.setProperty("--hist-search-find-top", `${top}px`);
+    this.root.style.setProperty("--bsrv-find-top", `${top}px`);
     this.placed = { right, top };
     return this.placed;
   }
