@@ -247,22 +247,44 @@
   outline-offset: 1px;
 }
 
-/* Obsidian 自带搜索的树形显示（实验性，设置里打开才生效） */
-.bsrv-sr-match {
-  margin-inline-start: calc(var(--bsrv-depth, 0) * 0.8em);
+/* Obsidian 自带搜索的树形显示（实验性，设置里打开才生效）：标题行在卡片外，卡片里是命中的上下文，层级用引导线表示 */
+.bsrv-sr-wrap {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.search-result-file-match.bsrv-sr-match {
+  --bsrv-step: 0.9em;
+  margin: 0;
+  padding: 0 0 0 calc(var(--bsrv-depth, 0) * var(--bsrv-step));
+  border: 0;
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent calc(var(--bsrv-step) - 1px),
+    var(--background-modifier-border) calc(var(--bsrv-step) - 1px),
+    var(--background-modifier-border) var(--bsrv-step)
+  );
+  background-repeat: no-repeat;
+  background-size: calc(var(--bsrv-depth, 0) * var(--bsrv-step)) 100%;
 }
 
 .bsrv-sr-rows {
-  margin-bottom: 0.25em;
+  margin: 0;
 }
 
 .bsrv-sr-node {
   display: flex;
   align-items: center;
   gap: 0.3em;
-  margin-inline-start: calc((var(--bsrv-row, 0) - var(--bsrv-depth, 0)) * 0.8em);
+  margin-inline-start: calc((var(--bsrv-row, 0) - var(--bsrv-depth, 0)) * var(--bsrv-step));
+  padding: 0.2em 0.4em;
   color: var(--text-muted);
-  font-size: var(--font-ui-smaller);
+  font-size: var(--font-ui-small);
   cursor: pointer;
 }
 
@@ -289,12 +311,21 @@
   display: none;
 }
 
+.bsrv-sr-body {
+  position: relative;
+  margin: 0.1em 0.4em 0.4em 0.2em;
+  padding: 0.4em 0.7em;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
 /* 整条结果都藏起来时连它自己的内边距也不占位 */
 .bsrv-sr-gone {
   display: none;
 }
 
-/* 折叠后只留标题行：命中的上下文（原生的子元素）全藏起来 */
-.bsrv-sr-body-hidden > :not(.bsrv-sr-rows) {
+/* 折叠后只留标题行：命中的上下文卡片藏起来 */
+.bsrv-sr-body-hidden > .bsrv-sr-body {
   display: none;
 }

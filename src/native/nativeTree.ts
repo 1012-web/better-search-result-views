@@ -22,6 +22,7 @@ interface MatchItem {
 interface FileItem {
   file?: { path?: string };
   content?: string;
+  childrenEl?: HTMLElement;
   vChildren?: { _children?: MatchItem[] };
 }
 
@@ -44,6 +45,7 @@ function isElement(value: unknown): value is HTMLElement {
 }
 
 const ROWS_CLASS = "bsrv-sr-rows";
+const BODY_CLASS = "bsrv-sr-body";
 
 export class NativeSearchTree {
   private enabled = false;
@@ -137,6 +139,7 @@ export class NativeSearchTree {
     if (typeof content !== "string" || !Array.isArray(children)) return;
     const matches = children.filter((item) => typeof item.start === "number" && isElement(item.el));
     if (!matches.length) return;
+    if (isElement(file.childrenEl) && !file.childrenEl.classList.contains("bsrv-sr-wrap")) file.childrenEl.classList.add("bsrv-sr-wrap");
     const index = this.headingIndex(file, content);
     const plans = planMatches(matches.map((item) => index.trailAt(item.start)));
     const path = file.file?.path ?? "";
@@ -160,6 +163,7 @@ export class NativeSearchTree {
     }
     if (!el.classList.contains("bsrv-sr-match")) el.classList.add("bsrv-sr-match");
     el.style.setProperty("--bsrv-depth", String(plan.trail.length));
+    if (this.wrapBody(el, rows)) changed = true;
 
     const visibility = visibilityOf(plan, collapsed);
     rows?.querySelectorAll<HTMLElement>(".bsrv-sr-node").forEach((node, position) => {
@@ -183,6 +187,20 @@ export class NativeSearchTree {
       }
     }
     if (changed) dom.infinityScroll?.invalidate?.(item);
+  }
+
+  /**
+   * 把自带搜索画在 el 里的内容（上下文文字、「显示更多」按钮等）装进一张独立的卡片里，
+   * 标题行留在卡片外面。自带搜索重画这条结果时会先清空 el，这里下一轮会再装一次。返回这次是否动过 DOM。
+   */
+  private wrapBody(el: HTMLElement, rows: HTMLElement | null): boolean {
+    let body = el.querySelector<HTMLElement>(`:scope > .${BODY_CLASS}`);
+    const loose = Array.from(el.childNodes).filter((node) => node !== rows && node !== body);
+    if (body && !loose.length) return false;
+    if (!body) body = createDiv({ cls: BODY_CLASS });
+    for (const node of loose) body.append(node);
+    if (body.parentElement !== el) el.append(body);
+    return true;
   }
 
   private buildRows(plan: MatchPlan, signature: string, path: string, leaf: WorkspaceLeaf): HTMLElement {
@@ -218,6 +236,11 @@ export class NativeSearchTree {
           for (const item of file.vChildren?._children ?? []) {
             if (!(isElement(item.el))) continue;
             item.el.querySelector(`:scope > .${ROWS_CLASS}`)?.remove();
+            const body = item.el.querySelector<HTMLElement>(`:scope > .${BODY_CLASS}`);
+            if (body) {
+              while (body.firstChild) item.el.insertBefore(body.firstChild, body);
+              body.remove();
+            }
             item.el.classList.remove("bsrv-sr-match", "bsrv-sr-body-hidden", "bsrv-sr-gone");
             item.el.style.removeProperty("--bsrv-depth");
             if (this.hiddenByUs.has(item) && item.info) {
@@ -226,6 +249,7 @@ export class NativeSearchTree {
             }
           }
         }
+        for (const file of files) if (isElement(file.childrenEl)) file.childrenEl.classList.remove("bsrv-sr-wrap");
         state.dom.infinityScroll?.invalidateAll?.();
       }
       this.detach(leaf);
