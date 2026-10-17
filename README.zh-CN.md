@@ -96,3 +96,7 @@ npm test
 npx eslint src  # 官方的 Obsidian 审查规则
 npm run unihan -- <Unihan.zip>   # 重新生成 Unihan 对照表
 ```
+
+## 社区
+
+LINUX DO（https://linux.do/）
